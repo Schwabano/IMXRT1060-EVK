@@ -1,0 +1,48 @@
+// Copyright 2018-2022 NXP
+// Probe types FTDI, LPC-Link1 (HID), LPC-Link1 (WINUSB),
+// and RDB_Link (HID or WINUSB) need to be grouped together
+// by their respective types, and ordered first in the
+// probe table. HID/WINUSB are one-off probes except for
+// the RDB-Link which can boot either type.
+// The rest are CMSIS-DAP based probes. CMSIS-DAP#WINUSB is
+// a convention to specify WINUSB; otherwise HID is assumed
+// 
+0x21BD, 0x0003, 512,1, 1, 0, 0, 0, "FTDI", 0x0000, 0, -1
+0x0403, 0xAD08, 512,1, 1, 0, 0, 0, "FTDI", 0x0000, 0, -1
+0x0640, 0x0026, 512,1, 1, 0, 0, 0, "FTDI", 0x0000, 0, -1
+0x1FC9, 0x0007, 512,1, 1, 0, 0, 0, "HID", 0x0000, -1, -1
+0x21BD, 0x0001, 512,1, 0, 0, 0, 0, "HID", 0x0000, 0, -1
+0x21BD, 0x0001, 512,1, 0, 0, 0, 0, "WINUSB", 0x0000, 0, -1
+0x1FC9, 0x0009, 512,1, 1, 0, 0, 0, "WINUSB", 0x0000, -1, -1
+0x1FC9, 0x0090, 1024, 1, 1, 0, 0, 0, "CMSIS-DAP", 0xFF00, 0, -1
+0x1FC9, 0x0143, 1024, 1, 1, 0, 0, 0, "CMSIS-DAP", 0xFF00, 0, -1
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0204
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0206
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0214
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0216
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0224
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0226
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0234
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0236
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0304
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0306
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0314
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0316
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0324
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0326
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0334
+0x1FC9, 0x0143, 1024, 0, 0, 0, 0, 0, "CMSIS-DAP", 0xFFEB, -1, 0x0336
+0x1FC9, 0x0143, 512, 1, 1, 0, 0, 1, "CMSIS-DAP#WINUSB", 0x0000, 0, -1
+0x1FC9, 0x001D, 64, 1, 0, 0, 0, 0, "", 0x0000, -1, -1
+0x1FC9, 0x0132, 64, 1, 1, 0, 0, 0, "", 0x0000, -1, -1
+0x0D28, 0x0019, 64, 1, 0, 0, 0, 0, "", 0x0000, -1, -1
+0x0D28, 0x0204, 64, 1, 1, 0, 0, 0, "", 0x0000, 3, -1
+0xC251, 0x2722, 64, 1, 1, 0, 0, 0, "", 0x0000, -1, -1
+0xC251, 0x2723, 64, 1, 1, 0, 0, 0, "", 0x0000, -1, -1
+0xC251, 0xF001, 1024, 1, 0, 0, 0, 0, "", 0x0000, -1, -1
+0xC251, 0xF002, 1024, 1, 0, 0, 0, 0, "", 0x0000, -1, -1
+0xC251, 0xF006, 1024, 1, 1, 0, 0, 0, "", 0x0000, -1, -1
+0x2786, 0xF00B, 64, 1, 0, 0, 0, 0, "", 0x0000, -1, -1
+0x21BD, 0x0007, 512, 1, 1, 0, 0, 0, "", 0x0000, -1, -1
+0x21BD, 0x0008, 64, 1, 0, 0, 0, 0, "", 0x0000, -1, -1
+0xC251, 0x2751, 1024, 1, 1, 0, 0, 0, "", 0x0000, -1, -1

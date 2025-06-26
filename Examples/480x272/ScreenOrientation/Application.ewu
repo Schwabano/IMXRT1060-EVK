@@ -1,0 +1,668 @@
+﻿$version 14.00
+
+// This is the root component of the entire GUI application.
+$rect <20,20,220,60>
+$output false
+class Application_Landscape : Core::Root
+{
+  $rect <20,440,220,480>
+  inherited property Bounds = <0,0,480,272>;
+
+  $rect <230,310,430,350>
+  inherited method UpdateLayout()
+  {
+    /* initialize the rect effects depending on the current position of the ball images and depending on the given size */
+    RectEffectRed.Value1    = BallRed.Bounds;
+    RectEffectRed.Value2    = rect( BallRed.Bounds.x1, aSize.y - BallRed.Bounds.h, BallRed.Bounds.x2, aSize.y );
+    RectEffectYellow.Value1 = BallYellow.Bounds;
+    RectEffectYellow.Value2 = rect( BallYellow.Bounds.x1, aSize.y - BallYellow.Bounds.h, BallYellow.Bounds.x2, aSize.y );
+    RectEffectGreen.Value1  = BallGreen.Bounds;
+    RectEffectGreen.Value2  = rect( BallGreen.Bounds.x1, aSize.y - BallGreen.Bounds.h, BallGreen.Bounds.x2, aSize.y );
+
+    /* start all rect effects */
+    RectEffectRed.Enabled    = true;
+    RectEffectYellow.Enabled = true;
+    RectEffectGreen.Enabled  = true;
+
+    /* set the screen size text */
+    SizeText.String = string( Bounds.w ) + "x" + string( Bounds.h );
+
+  }
+
+  // This is the application class prepared for the landscape mode.
+  // 
+  // It contains three RectEffects to animate the three ball images. The start- and \
+  // end-coordinates of the animation are calculated within the method UpdateLayout().
+  // 
+  // A touch handler triggers the slot method 'OnTouch' which moves the cross image \
+  // to the touched position and which prints the touch position as text.
+  // This helps to verify, that your touch driver on the target provides correct \
+  // coordinates.
+  note legend Note1
+  {
+    attr Bounds = <510,10,1080,180>;
+  }
+
+  // This is a generic touch handler.
+  $rect <20,20,160,60>
+  object Core::SimpleTouchHandler SimpleTouchHandler
+  {
+    preset Point4 = <0,0>;
+    preset Point3 = <480,0>;
+    preset Point2 = <480,272>;
+    preset Point1 = <0,272>;
+    preset OnDrag = OnTouch;
+    preset OnPress = OnTouch;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Background
+  {
+    preset Bounds = <0,0,480,272>;
+    preset ColorBL = #000000FF;
+    preset ColorBR = #000000FF;
+    preset ColorTR = #0000FFFF;
+    preset ColorTL = #0000FFFF;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image BallRed
+  {
+    preset Bounds = <20,20,60,60>;
+    preset Color = #FF483FFF;
+    preset Bitmap = Application::Ball;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image BallYellow
+  {
+    preset Bounds = <80,120,120,160>;
+    preset Color = #FFFB08FF;
+    preset Bitmap = Application::Ball;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image BallGreen
+  {
+    preset Bounds = <420,90,460,130>;
+    preset Color = #1DDA30FF;
+    preset Bitmap = Application::Ball;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Caption
+  {
+    preset Bounds = <60,10,420,50>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Screen Orientation Sample";
+    preset Font = Application::FontLarge;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text TouchText
+  {
+    preset Bounds = <150,160,330,190>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Touch Position";
+    preset Font = Application::FontSmall;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Footer
+  {
+    preset Bounds = <10,240,470,275>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "www.embedded-wizard.de";
+    preset Font = Application::FontSmall;
+    preset Color = #FFFFFFFF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Footer1
+  {
+    preset Bounds = <0,0,40,272>;
+    preset Orientation = Views::Orientation.Rotated_270;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Embedded Wizard";
+    preset Font = Application::FontSmall;
+    preset Color = #FFFFFFFF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Footer2
+  {
+    preset Bounds = <440,0,480,272>;
+    preset Orientation = Views::Orientation.Rotated_90;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Embedded Wizard";
+    preset Font = Application::FontSmall;
+    preset Color = #FFFFFFFF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text PosText
+  {
+    preset Bounds = <150,180,330,220>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "X: -- Y: --";
+    preset Font = Application::FontLarge;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image Cross
+  {
+    preset Bounds = <350,150,415,215>;
+    preset Bitmap = Application::Cross;
+  }
+
+  // This is a move and resize rectangle effect.
+  $rect <20,310,220,350>
+  object Effects::RectEffect RectEffectRed
+  {
+    preset Symmetric = true;
+    preset Timing = Effects::Timing.EaseIn_FastOut;
+    preset CycleDuration = 1200;
+    preset Outlet = ^BallRed.Bounds;
+  }
+
+  // This is a move and resize rectangle effect.
+  $rect <20,350,220,390>
+  object Effects::RectEffect RectEffectYellow
+  {
+    preset Symmetric = true;
+    preset Timing = Effects::Timing.EaseIn_FastOut;
+    preset CycleDuration = 1200;
+    preset InitialDelay = 200;
+    preset Outlet = ^BallYellow.Bounds;
+  }
+
+  // This is a move and resize rectangle effect.
+  $rect <20,390,220,430>
+  object Effects::RectEffect RectEffectGreen
+  {
+    preset Symmetric = true;
+    preset Timing = Effects::Timing.EaseIn_FastOut;
+    preset CycleDuration = 1200;
+    preset InitialDelay = 500;
+    preset Outlet = ^BallGreen.Bounds;
+  }
+
+  // This is a slot method connected with the touch handler. Each time the user touches \
+  // on the screen, this method is called. As a result, the position of the cross \
+  // image will be changed and the coordinates are shown as text.
+  $rect <230,350,430,390>
+  slot OnTouch
+  {
+    sender; /* the method is called from the sender object */
+
+    /* modify the position of the image:
+       get the touch position from the touch handler, adjust the position by half size of the image,
+       in order to put the center of the image to the touched position */
+    Cross.Bounds.origin = SimpleTouchHandler.CurrentPos - point ( Cross.Bounds.w / 2, Cross.Bounds.h / 2 );
+
+    /* print the current touch position */
+    PosText.String = "X: " + string( SimpleTouchHandler.CurrentPos.x ) + " Y: " + string( SimpleTouchHandler.CurrentPos.y );
+
+
+
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text ModeText
+  {
+    preset Bounds = <150,50,330,90>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Landscape";
+    preset Font = Application::FontLarge;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text ScreenText
+  {
+    preset Bounds = <150,90,330,120>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Screen Size";
+    preset Font = Application::FontSmall;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text SizeText
+  {
+    preset Bounds = <150,110,330,150>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset Font = Application::FontLarge;
+  }
+
+  $rect <230,390,430,430>
+  object Core::KeyPressHandler KeyHandler
+  {
+    preset OnPress = OnKeyPressed;
+    preset Filter = Core::KeyCode.AnyKey;
+    preset OnHold = OnKeyPressed;
+  }
+
+  $rect <230,430,430,470>
+  slot OnKeyPressed
+  {
+    sender; /* the method is called from the sender object */
+
+    var point pos = Cross.Bounds.center;
+
+    /* move image just one pixel into desired direction */
+    switch ( KeyHandler.Code )
+    {
+      case Core::KeyCode.Left:  pos = pos - <1,0>;
+      case Core::KeyCode.Right: pos = pos + <1,0>;
+      case Core::KeyCode.Up:    pos = pos - <0,1>;
+      case Core::KeyCode.Down:  pos = pos + <0,1>;
+      case Core::KeyCode.Key4:  pos = pos - <1,0>;
+      case Core::KeyCode.Key6:  pos = pos + <1,0>;
+      case Core::KeyCode.Key8:  pos = pos - <0,1>;
+      case Core::KeyCode.Key2:  pos = pos + <0,1>;
+      default:
+        ;
+    }
+
+    /* limit position of cross */
+    if ( pos.x < 0 ) pos.x = 0;
+    if ( pos.x >= Bounds.w ) pos.x = Bounds.w - 1;
+    if ( pos.y < 0 ) pos.y = 0;
+    if ( pos.y >= Bounds.h ) pos.y = Bounds.h - 1;
+
+    /* modify the position of the image */
+    Cross.Bounds.origin = pos - point ( Cross.Bounds.w / 2, Cross.Bounds.h / 2 );
+
+    /* print the current cross position */
+    PosText.String = "X: " + string( pos.x ) + " Y: " + string( pos.y );
+
+
+  }
+}
+
+// This is a bitmap resource.
+$rect <440,60,640,100>
+$output false
+resource Resources::Bitmap Cross
+{
+  attr bitmapfile FileName = .\Res\Cross.png;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Alpha8;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// This is a bitmap resource.
+$rect <440,20,640,60>
+$output false
+resource Resources::Bitmap Ball
+{
+  attr bitmapfile FileName = .\Res\Ball.png;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Alpha8;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Font resource for large font - used for the caption text items.
+$rect <230,20,430,60>
+$output false
+resource Resources::Font FontLarge
+{
+  attr fontname FontName = Arial;
+  attr fontheight Height = 32;
+  attr fontquality Quality = High;
+  attr fontranges Ranges = 0x20-0xFF;
+  attr fontaspectratio AspectRatio = 1.0;
+  attr fontbold Bold = false;
+  attr fontitalic Italic = false;
+  attr fontkerning Kerning = true;
+  attr fontheightmode HeightMode = Compatible;
+  attr fontrowdistance RowDistance;
+}
+
+// Font resource for small font - used for the description text items.
+$rect <230,60,430,100>
+$output false
+resource Resources::Font FontSmall
+{
+  attr fontname FontName = Arial;
+  attr fontheight Height = 20;
+  attr fontquality Quality = High;
+  attr fontranges Ranges = 0x20-0xFF;
+  attr fontaspectratio AspectRatio = 1.0;
+  attr fontbold Bold = false;
+  attr fontitalic Italic = false;
+  attr fontkerning Kerning = true;
+  attr fontheightmode HeightMode = Compatible;
+  attr fontrowdistance RowDistance;
+}
+
+// This is the root component of the entire GUI application.
+$rect <20,60,220,100>
+$output false
+class Application_Portrait : Core::Root
+{
+  $rect <300,130,500,170>
+  inherited property Bounds = <0,0,272,480>;
+
+  $rect <300,180,500,220>
+  inherited method UpdateLayout()
+  {
+    /* initialize the rect effects depending on the current position of the ball images and depending on the given size */
+    RectEffectRed.Value1    = BallRed.Bounds;
+    RectEffectRed.Value2    = rect( BallRed.Bounds.x1, aSize.y - BallRed.Bounds.h, BallRed.Bounds.x2, aSize.y );
+    RectEffectYellow.Value1 = BallYellow.Bounds;
+    RectEffectYellow.Value2 = rect( BallYellow.Bounds.x1, aSize.y - BallYellow.Bounds.h, BallYellow.Bounds.x2, aSize.y );
+    RectEffectGreen.Value1  = BallGreen.Bounds;
+    RectEffectGreen.Value2  = rect( BallGreen.Bounds.x1, aSize.y - BallGreen.Bounds.h, BallGreen.Bounds.x2, aSize.y );
+
+    /* start all rect effects */
+    RectEffectRed.Enabled    = true;
+    RectEffectYellow.Enabled = true;
+    RectEffectGreen.Enabled  = true;
+
+    /* set the screen size text */
+    SizeText.String = string( Bounds.w ) + "x" + string( Bounds.h );
+
+  }
+
+  // This is a generic touch handler.
+  $rect <20,20,160,60>
+  object Core::SimpleTouchHandler SimpleTouchHandler
+  {
+    preset Point4 = <0,0>;
+    preset Point3 = <272,0>;
+    preset Point2 = <272,480>;
+    preset Point1 = <0,480>;
+    preset OnDrag = OnTouch;
+    preset OnPress = OnTouch;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Background
+  {
+    preset Bounds = <0,0,272,480>;
+    preset ColorBL = #000000FF;
+    preset ColorBR = #000000FF;
+    preset ColorTR = #0000FFFF;
+    preset ColorTL = #0000FFFF;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image BallRed
+  {
+    preset Bounds = <10,210,50,250>;
+    preset Color = #FF483FFF;
+    preset Bitmap = Application::Ball;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image BallYellow
+  {
+    preset Bounds = <55,290,95,330>;
+    preset Color = #FFFB08FF;
+    preset Bitmap = Application::Ball;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image BallGreen
+  {
+    preset Bounds = <220,260,260,300>;
+    preset Color = #1DDA30FF;
+    preset Bitmap = Application::Ball;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Caption
+  {
+    preset Bounds = <10,10,260,90>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Screen Orientation Sample";
+    preset Font = Application::FontLarge;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text TouchText
+  {
+    preset Bounds = <40,200,230,230>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Touch Position";
+    preset Font = Application::FontSmall;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Footer
+  {
+    preset Bounds = <0,440,270,480>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "www.embedded-wizard.de";
+    preset Font = Application::FontSmall;
+    preset Color = #FFFFFFFF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Footer1
+  {
+    preset Bounds = <0,210,40,480>;
+    preset Orientation = Views::Orientation.Rotated_270;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Embedded Wizard";
+    preset Font = Application::FontSmall;
+    preset Color = #FFFFFFFF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Footer2
+  {
+    preset Bounds = <230,210,270,480>;
+    preset Orientation = Views::Orientation.Rotated_90;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Embedded Wizard";
+    preset Font = Application::FontSmall;
+    preset Color = #FFFFFFFF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text PosText
+  {
+    preset Bounds = <40,220,230,260>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "X: -- Y: --";
+    preset Font = Application::FontLarge;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image Cross
+  {
+    preset Bounds = <160,330,225,395>;
+    preset Bitmap = Application::Cross;
+  }
+
+  // This is a move and resize rectangle effect.
+  $rect <300,0,500,40>
+  object Effects::RectEffect RectEffectRed
+  {
+    preset Symmetric = true;
+    preset Timing = Effects::Timing.EaseIn_FastOut;
+    preset CycleDuration = 1200;
+    preset Outlet = ^BallRed.Bounds;
+  }
+
+  // This is a move and resize rectangle effect.
+  $rect <300,40,500,80>
+  object Effects::RectEffect RectEffectYellow
+  {
+    preset Symmetric = true;
+    preset Timing = Effects::Timing.EaseIn_FastOut;
+    preset CycleDuration = 1200;
+    preset InitialDelay = 200;
+    preset Outlet = ^BallYellow.Bounds;
+  }
+
+  // This is a move and resize rectangle effect.
+  $rect <300,80,500,120>
+  object Effects::RectEffect RectEffectGreen
+  {
+    preset Symmetric = true;
+    preset Timing = Effects::Timing.EaseIn_FastOut;
+    preset CycleDuration = 1200;
+    preset InitialDelay = 500;
+    preset Outlet = ^BallGreen.Bounds;
+  }
+
+  // This is a slot method connected with the touch handler. Each time the user touches \
+  // on the screen, this method is called. As a result, the position of the cross \
+  // image will be changed and the coordinates are shown as text.
+  $rect <300,220,500,260>
+  slot OnTouch
+  {
+    sender; /* the method is called from the sender object */
+
+    /* modify the position of the image:
+       get the touch position from the touch handler, adjust the position by half size of the image,
+       in order to put the center of the image to the touched position */
+    Cross.Bounds.origin = SimpleTouchHandler.CurrentPos - point ( Cross.Bounds.w / 2, Cross.Bounds.h / 2 );
+
+    /* print the current touch position */
+    PosText.String = "X: " + string( SimpleTouchHandler.CurrentPos.x ) + " Y: " + string( SimpleTouchHandler.CurrentPos.y );
+
+
+
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text ModeText
+  {
+    preset Bounds = <10,90,260,130>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Portrait Mode";
+    preset Font = Application::FontLarge;
+  }
+
+  // This is the application class prepared for the portrait mode.
+  // 
+  // It contains three RectEffects to animate the three ball images. The start- and \
+  // end-coordinates of the animation are calculated within the method UpdateLayout().
+  // 
+  // A touch handler triggers the slot method 'OnTouch' which moves the cross image \
+  // to the touched position and which prints the touch position as text.
+  // This helps to verify, that your touch driver on the target provides correct \
+  // coordinates.
+  note legend Note1
+  {
+    attr Bounds = <520,10,910,260>;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text ScreenText
+  {
+    preset Bounds = <40,130,230,160>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "Screen Size";
+    preset Font = Application::FontSmall;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text SizeText
+  {
+    preset Bounds = <40,150,230,190>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset Font = Application::FontLarge;
+  }
+
+  $rect <300,270,500,310>
+  object Core::KeyPressHandler KeyHandler
+  {
+    preset OnPress = OnKeyPressed;
+    preset Filter = Core::KeyCode.AnyKey;
+    preset OnHold = OnKeyPressed;
+  }
+
+  $rect <300,310,500,350>
+  slot OnKeyPressed
+  {
+    sender; /* the method is called from the sender object */
+
+    var point pos = Cross.Bounds.center;
+
+    /* move image just one pixel into desired direction */
+    switch ( KeyHandler.Code )
+    {
+      case Core::KeyCode.Left:  pos = pos - <1,0>;
+      case Core::KeyCode.Right: pos = pos + <1,0>;
+      case Core::KeyCode.Up:    pos = pos - <0,1>;
+      case Core::KeyCode.Down:  pos = pos + <0,1>;
+      case Core::KeyCode.Key4:  pos = pos - <1,0>;
+      case Core::KeyCode.Key6:  pos = pos + <1,0>;
+      case Core::KeyCode.Key8:  pos = pos - <0,1>;
+      case Core::KeyCode.Key2:  pos = pos + <0,1>;
+      default:
+        ;
+    }
+
+    /* limit position of cross */
+    if ( pos.x < 0 ) pos.x = 0;
+    if ( pos.x >= Bounds.w ) pos.x = Bounds.w - 1;
+    if ( pos.y < 0 ) pos.y = 0;
+    if ( pos.y >= Bounds.h ) pos.y = Bounds.h - 1;
+
+    /* modify the position of the image */
+    Cross.Bounds.origin = pos - point ( Cross.Bounds.w / 2, Cross.Bounds.h / 2 );
+
+    /* print the current cross position */
+    PosText.String = "X: " + string( pos.x ) + " Y: " + string( pos.y );
+
+
+  }
+}
+
+// This is the unit 'Application' of the 'ScreenOrientation' example.
+// 
+// The unit contains two different application classes: One for the landscape mode \
+// (width > height) and one for the portrait mode (height > width).
+// Each of them implements the appearance and the behavior of the simple UI application.
+// 
+// Additionally, the unit contains the necessary resources for the sample: Two different \
+// font resources and two bitmap resources.
+// The font resources are used to display text views, bitmap resources are used within \
+// image views.
+// 
+// You can double-click on one of the application bricks to open the corresponding \
+// class within the Composer.
+note legend Note1
+{
+  attr Bounds = <10,130,670,360>;
+}

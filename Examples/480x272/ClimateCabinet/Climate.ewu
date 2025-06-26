@@ -1,0 +1,3141 @@
+﻿$version 14.00
+
+// This is a GUI component.
+$rect <40,80,240,120>
+$output false
+class Climate : Core::Group
+{
+  // Slot method to perform the menu move animation.
+  $rect <630,390,830,430>
+  slot onAnimateSlider
+  {
+    sender; /* the method is called from the sender object */
+
+    if (( slider == null ) || ( dataItem == null ))
+      return;
+
+    var int32 delta = Climate::MenuItemSize.x / 5 * 4;
+
+    slider.Bounds.origin.x = MoveSliderEffect.Value;
+
+    if ( MoveSliderEffect.Value - delta < dataItemOriginX )
+      dataItem.Bounds.origin.x =  MoveSliderEffect.Value - delta;
+    else
+      dataItem.Bounds.origin.x = dataItemOriginX;
+
+  }
+
+  $rect <0,500,200,540>
+  inherited property Bounds = <0,0,480,272>;
+
+  $rect <630,10,830,50>
+  inherited method Init()
+  {
+    Rectangle.Bounds = Bounds.orect;
+
+    var Climate::MenuItem item;
+    var Climate::DataItem data;
+
+    /* create menu item for temperature and humidity */
+    item = new Climate::MenuItem;
+    item.Caption       = "Temperature and Humidity";
+    item.Type          = Climate::MenuType.TempHumid;
+
+    data = new Climate::DataItem;
+    data.Bounds.size   = Climate::DataItemSize;
+    data.Caption       = "Temperature";
+    data.Unit          = Climate::UnitType.Temperature;
+    data.DataPoint     = ^Device.NominalTemp;
+    data.MinValue      = 0;
+    data.MaxValue      = 90;
+    data.ValueColor    = Climate::GraphColor;
+    data.OnChange      = ShowSlider;
+
+    item.DataItem = data;
+
+    data = new Climate::DataItem;
+    data.Bounds.size   = Climate::DataItemSize;
+    data.Caption       = "Humidity";
+    data.Unit          = Climate::UnitType.Percent;
+    data.DataPoint     = ^Device.Humidity;
+    data.MinValue      = 0;
+    data.MaxValue      = 100;
+    data.ValueColor    = Climate::HumidityColor;
+    data.OnChange      = ShowSlider;
+
+    item.DataItem.NextDataItem = data;
+
+    AppendMenuItem( item );
+
+    /* create menu item for dwell time */
+    item = new Climate::MenuItem;
+    item.Caption       = "Dwell Time";
+    item.Type          = Climate::MenuType.DwellTime;
+
+    data = new Climate::DataItem;
+    data.Bounds.size   = Climate::DataItemSizeLarge;
+    data.Caption       = "Dwell Time";
+    data.Unit          = Climate::UnitType.Time;
+    data.DataPoint     = ^Device.DwellTime;
+    data.MinValue      = 10;
+    data.MaxValue      = 480;
+    data.ValueColor    = Climate::TextColor;
+    data.OnChange      = ShowSlider;
+
+    item.DataItem = data;
+
+    AppendMenuItem( item );
+
+    /* create menu item for heating and cooling time */
+    item = new Climate::MenuItem;
+    item.Caption       = "Heating and Cooling Time";
+    item.Type          = Climate::MenuType.HeatCool;
+
+    data = new Climate::DataItem;
+    data.Bounds.size   = Climate::DataItemSize;
+    data.Caption       = "Heating Time";
+    data.Unit          = Climate::UnitType.Time;
+    data.DataPoint     = ^Device.HeatTime;
+    data.MinValue      = 10;
+    data.MaxValue      = 60;
+    data.ValueColor    = Climate::TextColor;
+    data.OnChange      = ShowSlider;
+
+    item.DataItem = data;
+
+    data = new Climate::DataItem;
+    data.Bounds.size   = Climate::DataItemSize;
+    data.Caption       = "Cooling Time";
+    data.Unit          = Climate::UnitType.Time;
+    data.DataPoint     = ^Device.CoolTime;
+    data.MinValue      = 10;
+    data.MaxValue      = 60;
+    data.ValueColor    = Climate::TextColor;
+    data.OnChange      = ShowSlider;
+
+    item.DataItem.NextDataItem = data;
+
+    AppendMenuItem( item );
+
+    Diagram.Bounds = Climate::ChartStopPos;
+    Restack( Diagram, 100 );
+
+    StartButton.Bounds = Climate::StartButtonPos;
+
+    StatusBar.Bounds = Climate::StatusBarPos;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,0,480,270>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This variable refers to the first menu item.
+  $rect <840,60,1040,100>
+  var Climate::MenuItem FirstMenuItem = null;
+
+  // The method 'AppendMenuItem' adds the menu item to the end of the chained list \
+  // of menu items.
+  $rect <630,60,830,100>
+  method void AppendMenuItem( arg Climate::MenuItem aItem )
+  {
+    var point origin = Climate::Spacing;
+
+    /* configure the item */
+    aItem.Bounds.size = Climate::MenuItemSize;
+    aItem.OnChange = MenuItemSelected;
+
+    /* maybe the given item is the first one... */
+
+    if ( FirstMenuItem == null )
+    {
+      FirstMenuItem = aItem;
+      LastMenuItem = aItem;
+    }
+    else
+    {
+      /* calculate position of the new item relative to last item */
+      origin.y = origin.y + LastMenuItem.Bounds.y2;
+      
+      /* append new item at end of the list */
+      LastMenuItem.NextMenuItem = aItem;
+      LastMenuItem = aItem;
+    }
+
+    /* set position of the item */
+    aItem.Bounds.origin = origin;
+
+    /* show the item */
+    Add( aItem, 0 );
+
+    /* show all data items */
+    var Climate::DataItem data = aItem.DataItem;
+    while ( data != null )
+    {
+      Add( data, 0 );
+      data = data.NextDataItem;
+    }
+
+    /* take care that start button and diagram are not overlapped... */
+    Restack( Diagram, 100 );
+    Restack( StartButton, 100 );
+
+
+
+
+
+  }
+
+  // This variable refers to the last menu item.
+  $rect <841,100,1041,140>
+  var Climate::MenuItem LastMenuItem = null;
+
+  // This slot method is called from the menu items when the user has clicked on \
+  // it.
+  $rect <630,160,830,200>
+  slot MenuItemSelected
+  {
+    var int32 shift = 0; 
+    var bool found = false;
+
+    /* remove slider if there is one */
+    if ( slider != null )
+      postsignal HideSlider;
+
+    /* ignore menu item selection in case that machine is running or an animation is running */
+    if ( Device.Running || MoveMenuEffect.Enabled )
+      return;
+
+    var Climate::MenuItem selectedItem = (Climate::MenuItem)sender;
+
+    /* check if the signal comes from a menu item */
+    if ( selectedItem == null )
+      return;
+
+    var Climate::MenuItem item = FirstMenuItem;
+
+    while (( item != null ) && !found )
+    {
+      if ( item != selectedItem )
+      {
+        /* increase the distance for the animation */
+        shift = shift - Climate::Spacing.y - Climate::MenuItemSize.y;
+
+        /* create a copy of the menu item and append it at the end of the list */
+        var Climate::MenuItem newItem = new Climate::MenuItem;
+        newItem.Caption = item.Caption;
+        newItem.Type = item.Type;
+        AppendMenuItem( newItem );
+
+        /* take the next item */
+        item = item.NextMenuItem;
+      }
+      else
+        found = true;
+    }
+
+    /* start the animation */
+    MoveMenuEffect.Value1 = 0;
+    MoveMenuEffect.Value2 = shift;
+    MoveMenuEffect.Enabled = true;
+
+
+  }
+
+  // This is an int32 change effect.
+  $rect <630,200,830,240>
+  object Effects::Int32Effect MoveMenuEffect
+  {
+    preset OnFinished = onFinishedMenu;
+    preset OnAnimate = onAnimateMenu;
+    preset Timing = Effects::Timing.FastIn_EaseOut;
+    preset NoOfCycles = 1;
+    preset CycleDuration = 300;
+  }
+
+  // Slot method to perform the menu move animation.
+  $rect <840,160,1040,200>
+  slot onAnimateMenu
+  {
+    sender; /* the method is called from the sender object */
+
+    var Climate::MenuItem item = FirstMenuItem;
+
+    /* calculate start position and items delta */
+    var int32 y = Climate::Spacing.y + MoveMenuEffect.Value;
+    var int32 delta = Climate::Spacing.y + Climate::MenuItemSize.y;
+
+    /* move all menu items... */
+    while ( item != null )
+    {
+      /* adjust position */
+      item.Bounds.origin.y = y;
+
+      /* calculate next position */
+      y = y + delta;
+
+      /* take next item */
+      item = item.NextMenuItem;
+    }
+
+  }
+
+  // Slot method to rearrange the menu structure after the menu move animation.
+  $rect <840,200,1040,240>
+  slot onFinishedMenu
+  {
+    sender; /* the method is called from the sender object */
+
+    /* remove all menu items at the beginning of the chained list that are outside */
+    while ( FirstMenuItem != null )
+    {
+      if ( FirstMenuItem.Bounds.origin.y < 0 )
+      {
+        /* search for the next menu item that has the same menu type in order to give them the asociated data items */
+        var Climate::MenuItem item = FirstMenuItem.NextMenuItem;
+        while (( item != null ) && ( item.Type != FirstMenuItem.Type ))
+          item = item.NextMenuItem;
+        if ( item != null )
+          item.DataItem = FirstMenuItem.DataItem;
+
+        /* set the following menu item as first menu item => first menu item will be deleted by GC */
+        Remove( FirstMenuItem );
+        FirstMenuItem = FirstMenuItem.NextMenuItem;
+      }
+      else
+        return;
+    }  
+
+  }
+
+  // Variable to access device class and to keep the simulated data in memory.
+  $rect <210,500,410,540>
+  var Climate::DeviceClass Device = Climate::Device;
+
+  $rect <20,20,160,60>
+  object Climate::StatusBar StatusBar
+  {
+    preset Bounds = <260,365,780,460>;
+  }
+
+  $rect <20,20,160,60>
+  object Climate::Diagram Diagram
+  {
+    preset Bounds = <156,65,480,272>;
+  }
+
+  $rect <20,20,160,60>
+  object Climate::StartButton StartButton
+  {
+    preset Bounds = <0,200,160,275>;
+    preset OnAction = onStartStop;
+    preset IsRunning = ^Climate::Device.Running;
+  }
+
+  // This is a slot method.
+  $rect <420,500,620,540>
+  slot onStartStop
+  {
+    sender; /* the method is called from the sender object */
+
+    /* remove slider if there is one */
+    if ( slider != null )
+      postsignal HideSlider;
+
+    /* restack diagram topmost */
+    Restack( Diagram, 100 );
+
+    /* take current diagram position as start value */
+    RectEffect.Value1 = Diagram.Bounds;
+
+    /* determine end position */
+    if ( Device.Running == true )
+      RectEffect.Value2 = Climate::ChartStartPos;
+    else
+      RectEffect.Value2 = Climate::ChartStopPos;
+
+    /* restart timer */
+    RectEffect.Enabled = false;
+    RectEffect.Enabled = true;
+
+
+  }
+
+  // This is a move and resize rectangle effect.
+  $rect <420,540,620,580>
+  object Effects::RectEffect RectEffect
+  {
+    preset Timing = Effects::Timing.FastIn_EaseOut;
+    preset NoOfCycles = 1;
+    preset CycleDuration = 300;
+    preset Outlet = ^Diagram.Bounds;
+  }
+
+  // This is a slot method.
+  $rect <630,300,830,340>
+  slot ShowSlider
+  {
+    /* ignore menu item selection in case that machine is running */
+    if ( Device.Running )
+      return;
+
+    /* check if there is already a slider active */
+    if ( slider != null )
+      return;
+
+    /* store the data item, that needs the slider */
+    dataItem = (Climate::DataItem)sender;
+    if ( dataItem == null )
+      return;
+
+    slider = new Climate::SliderItem;
+    slider.Bounds.origin = point( Bounds.w, Climate::Spacing.y );
+    slider.Bounds.size = Climate::SliderSize;
+    slider.Outlet = dataItem.DataPoint;
+    slider.MinValue = dataItem.MinValue;
+    slider.MaxValue = dataItem.MaxValue;
+    slider.Triangle.Color = dataItem.ValueColor;
+    slider.OnClose = HideSlider;
+
+    /* save position of data item - used for move out */
+    dataItemOriginX = dataItem.Bounds.origin.x;
+
+    /* restack data item to top */
+    Restack( dataItem, 100 );
+
+    Add( slider, 0 );
+
+    MoveSliderEffect.Value1 = Bounds.w;
+    MoveSliderEffect.Value2 = Bounds.w - Climate::SliderSize.x - Climate::Spacing.x + 1;
+    MoveSliderEffect.Enabled = false;
+    MoveSliderEffect.Enabled = true;
+
+
+
+  }
+
+  // This is a slot method.
+  $rect <840,300,1040,340>
+  slot HideSlider
+  {
+    sender; /* the method is called from the sender object */
+
+    MoveSliderEffect.Value1 = Bounds.w - Climate::SliderSize.x - Climate::Spacing.x + 1;
+    MoveSliderEffect.Value2 = Bounds.w;
+    MoveSliderEffect.Enabled = false;
+    MoveSliderEffect.Enabled = true;
+
+  }
+
+  // This is an int32 change effect.
+  $rect <630,350,830,390>
+  object Effects::Int32Effect MoveSliderEffect
+  {
+    preset OnFinished = onFinishedSlider;
+    preset OnAnimate = onAnimateSlider;
+    preset Timing = Effects::Timing.FastIn_EaseOut;
+    preset NoOfCycles = 1;
+    preset CycleDuration = 500;
+  }
+
+  // Slot method to rearrange the menu structure after the menu move animation.
+  $rect <630,430,830,470>
+  slot onFinishedSlider
+  {
+    sender; /* the method is called from the sender object */
+
+    /* in case of move out, delete slider */
+    if ( MoveSliderEffect.Value2 > MoveSliderEffect.Value1 )
+    {
+      Remove( slider );
+      slider = null;
+    }
+
+
+  }
+
+  // This is a variable.
+  $rect <840,350,1040,390>
+  var Climate::SliderItem slider = null;
+
+  // This is a variable.
+  $rect <840,390,1040,430>
+  var Climate::DataItem dataItem = null;
+
+  // This is a variable.
+  $rect <840,430,1040,470>
+  var int32 dataItemOriginX = 0;
+
+  // Slot method to trigger the next phase of the auto demo.
+  $rect <630,500,830,540>
+  slot AutoDemoSlot
+  {
+    sender; /* the method is called from the sender object */
+
+    switch ( AutoState )
+    {
+      case  0: /* first we have so synchronize to TempHumid menu item */
+        if ( FirstMenuItem.Type == Climate::MenuType.TempHumid )
+          postsignal FirstMenuItem.AutoDemo;
+        else if ( FirstMenuItem.NextMenuItem.Type == Climate::MenuType.TempHumid )
+          postsignal FirstMenuItem.NextMenuItem.AutoDemo;
+        else
+          postsignal FirstMenuItem.NextMenuItem.NextMenuItem.AutoDemo;
+          
+      case  1: postsignal FirstMenuItem.NextMenuItem.AutoDemo;
+      case  2: postsignal FirstMenuItem.NextMenuItem.AutoDemo;
+      case  3: postsignal FirstMenuItem.NextMenuItem.AutoDemo;
+      case  4: postsignal FirstMenuItem.DataItem.AutoDemo;
+      case  5: Device.NominalTemp = 65; 
+      case  6: Device.NominalTemp = 75; 
+      case  7: Device.NominalTemp = 79; 
+      case  8: postsignal FirstMenuItem.NextMenuItem.AutoDemo;
+      case  9: postsignal FirstMenuItem.DataItem.AutoDemo;
+      case 10: Device.DwellTime = 110; 
+      case 11: Device.DwellTime = 100; 
+      case 12: Device.DwellTime = 80; 
+      case 13: Device.DwellTime = 70; 
+      case 14: postsignal FirstMenuItem.NextMenuItem.AutoDemo;
+      case 15: postsignal FirstMenuItem.DataItem.AutoDemo;
+      case 16: Device.HeatTime = 25; 
+      case 17: Device.HeatTime = 20; 
+      case 18: Device.HeatTime = 15; 
+      case 19: postsignal FirstMenuItem.NextMenuItem.AutoDemo;
+      case 20: 
+      {
+        Device.Running = true;
+        postsignal onStartStop;
+      }
+      
+      case 29:
+      {
+        Device.Running = false;
+        postsignal onStartStop;
+      }
+
+
+      default:
+       ;
+    }
+
+    AutoState = AutoState + 1;
+    if ( AutoState > 29 )
+      AutoState = 0;
+  }
+
+  // Variable to store the current phase of the auto demo.
+  $rect <840,500,1040,540>
+  var int32 AutoState = 0;
+
+  // This is the main screen of the climate cabinet. It is responsible to arrange \
+  // and move the menu items on the left side and to host the diagram in the remaining \
+  // area.
+  // 
+  // As soon as a menu item is pressed, the slot method 'MenuItemSelected()' starts \
+  // the animation to move the desired menu item on the top position. The menu appears \
+  // like a carousel: the menu items that leave the screen on the top border will \
+  // be added at the bottom end. 
+  // 
+  // When the user presses the start button, the diagram is moved to cover the entire \
+  // screen above the status bar.
+  // 
+  // To run the application within the Prototyper, press 'F5'.
+  note legend Note1
+  {
+    attr Bounds = <10,590,1040,750>;
+  }
+
+  // Timer object to drive the auto demo mode.
+  $rect <630,540,830,580>
+  object Core::Timer AutoDemoTimer
+  {
+    preset OnTrigger = AutoDemoSlot;
+    preset Period = 1000;
+    preset Begin = 0;
+  }
+
+  // Directives to adapt the order of members belonging to this class so they appear 
+  // correctly arranged relative to the members inherited from the ancestor (super) 
+  // classes. The numbers indicate the order-displacement to apply on the respective 
+  // member once all members have been loaded and combined with members from the 
+  // ancestor classes.
+  $reorder onAnimateSlider 75
+}
+
+// Color constant according UI design.
+$rect <690,50,890,90>
+$output false
+const color BorderColor = #05545DFF;
+
+// Color constant according UI design.
+$rect <690,90,890,130>
+$output false
+const color BackColor = #031C1FFF;
+
+// Color constant according UI design.
+$rect <690,130,890,170>
+$output false
+const color SelectColor = #03272BFF;
+
+// Color constant according UI design.
+$rect <690,170,890,210>
+$output false
+const color StartColor = #73BD13FF;
+
+// Color constant according UI design.
+$rect <690,210,890,250>
+$output false
+const color GraphColor = #FF5601FF;
+
+// Color constant according UI design.
+$rect <690,250,890,290>
+$output false
+const color TextColor = #FFFFFFFF;
+
+// This is a font resource.
+$rect <490,530,690,570>
+$output false
+resource Resources::Font MediumFont
+{
+  attr fontname FontName = Roboto;
+  attr fontheight Height = 16;
+  attr fontquality Quality = High;
+  attr fontranges Ranges = 0x20-0xFF;
+  attr fontaspectratio AspectRatio = 1.0;
+  attr fontbold Bold = false;
+  attr fontitalic Italic = false;
+  attr fontkerning Kerning = true;
+  attr fontheightmode HeightMode = Compatible;
+  attr fontrowdistance RowDistance;
+}
+
+// Constant to define the spacing between the menu items.
+$rect <490,50,690,90>
+$output false
+const point Spacing = <12,12>;
+
+// Constant to define the size of a single menu item
+$rect <490,90,690,130>
+$output false
+const point MenuItemSize = <144,53>;
+
+// This is a font resource.
+$rect <490,570,690,610>
+$output false
+resource Resources::Font LargeFont
+{
+  attr fontname FontName = Roboto Light;
+  attr fontheight Height = 36;
+  attr fontquality Quality = High;
+  attr fontranges Ranges = '0'-'9','°','%',':','a'-'z','A'-'Z';
+  attr fontaspectratio AspectRatio = 1.0;
+  attr fontbold Bold = false;
+  attr fontitalic Italic = false;
+  attr fontkerning Kerning = true;
+  attr fontheightmode HeightMode = Compatible;
+  attr fontrowdistance RowDistance;
+}
+
+// This is a bitmap resource.
+$rect <690,490,890,530>
+$output false
+resource Resources::Bitmap Edge
+{
+  attr bitmapfile FileName = .\Res\Edge.png;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Constant to define the size of a single data item.
+$rect <490,130,690,170>
+$output false
+const point DataItemSize = <156,53>;
+
+// Constant to define the size of a single data item.
+$rect <490,170,690,210>
+$output false
+const point DataItemSizeLarge = <312,53>;
+
+// Constant to define the size of the diagram.
+$rect <490,210,690,250>
+$output false
+const rect ChartStopPos = <156,65,480,272>;
+
+// This is a bitmap resource.
+$rect <690,530,890,570>
+$output false
+resource Resources::Bitmap Wiper
+{
+  attr bitmapfile FileName = .\Res\Wiper.png;
+  attr framesize FrameSize = <60,12>;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Alpha8;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// This is a font resource.
+$rect <490,490,690,530>
+$output false
+resource Resources::Font SmallFont
+{
+  attr fontname FontName = Roboto;
+  attr fontheight Height = 12;
+  attr fontquality Quality = High;
+  attr fontranges Ranges = 0x20-0xFF;
+  attr fontaspectratio AspectRatio = 1.0;
+  attr fontbold Bold = false;
+  attr fontitalic Italic = false;
+  attr fontkerning Kerning = true;
+  attr fontheightmode HeightMode = Compatible;
+  attr fontrowdistance RowDistance;
+}
+
+// Color constant according UI design.
+$rect <690,290,890,330>
+$output false
+const color HumidityColor = #00C9FFFF;
+
+// This is a bitmap resource.
+$rect <690,570,890,610>
+$output false
+resource Resources::Bitmap DashLineV
+{
+  attr bitmapfile FileName = .\Res\DashLineV.png;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Alpha8;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// This is a bitmap resource.
+$rect <690,610,890,650>
+$output false
+resource Resources::Bitmap DashLineH
+{
+  attr bitmapfile FileName = .\Res\DashLineH.png;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Alpha8;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Constant to define the size of the diagram.
+$rect <490,250,690,290>
+$output false
+const rect ChartStartPos = <0,0,480,207>;
+
+// Constant to define the size of the diagram.
+$rect <490,290,690,330>
+$output false
+const rect StartButtonPos = <12,195,156,272>;
+
+// Constant to define the size of the diagram.
+$rect <490,330,690,370>
+$output false
+const rect StatusBarPos = <156,207,468,260>;
+
+// Constant to define the size of the slider item
+$rect <490,370,690,410>
+$output false
+const point SliderSize = <341,53>;
+
+// This is a bitmap resource.
+$rect <690,650,890,690>
+$output false
+resource Resources::Bitmap Triangle
+{
+  attr bitmapfile FileName = .\Res\Triangle.png;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Alpha8;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// This is a bitmap resource.
+$rect <690,690,890,730>
+$output false
+resource Resources::Bitmap Thumb
+{
+  attr bitmapfile FileName = .\Res\Thumb.png;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Layout and color constants
+note group Note1
+{
+  attr Bounds = <470,10,910,430>;
+}
+
+// Resources
+note group Note2
+{
+  attr Bounds = <470,440,910,750>;
+}
+
+// The sample application 'ClimateCabinet' implements the user interface of a climatic \
+// exposure test cabinent. The user can define a heating time, a nominal temperature \
+// and humidity, a dwell time and the final cooling time.
+// 
+// The parameters can be set within a scrolling menu. The current parameters are \
+// shown within a graph diagram.
+// 
+// This demo application is implemented for a screen size of 480x272 pixel.
+note legend Note4
+{
+  attr Bounds = <20,440,460,670>;
+}
+
+// Graphical design of 'ClimateCabinet' by Coeno - http://www.coeno.com
+note legend Note5
+{
+  attr Bounds = <20,680,460,750>;
+}
+
+// This is a GUI component.
+$rect <40,180,240,220>
+$output false
+class MenuItem : Core::Group
+{
+  $rect <10,240,210,280>
+  inherited onset Bounds
+  {
+    super( value );
+
+    /* adjust the asociated data item... */
+    if ( DataItem != null )
+      DataItem.Bounds.origin = point( Bounds.x2, Bounds.y1 );
+
+  }
+
+  $rect <10,200,210,240>
+  inherited property Bounds = <0,0,240,95>;
+
+  $rect <10,160,210,200>
+  inherited method UpdateLayout()
+  {
+    super( aSize );
+
+    Text.Bounds = rect( Climate::Spacing.x, 0, aSize.x, aSize.y );
+
+
+
+  }
+
+  $rect <10,120,210,160>
+  inherited method UpdateViewState()
+  {
+    aState;
+
+    /* colorize background if currently selected */
+    if ( TouchHandler.Down && TouchHandler.Inside )
+      Background.Color = Climate::BorderColor;
+    else 
+      Background.Color = Climate::BackColor;
+
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Background
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,0,240,95>;
+    preset Color = Climate::BackColor;
+  }
+
+  $rect <20,20,160,60>
+  object Core::SimpleTouchHandler TouchHandler
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Point4 = <0,95>;
+    preset Point3 = <240,95>;
+    preset Point2 = <240,0>;
+    preset Point1 = <0,0>;
+    preset OnLeave = enterLeaveSlot;
+    preset OnEnter = enterLeaveSlot;
+    preset OnRelease = pressReleaseSlot;
+    preset OnPress = pressReleaseSlot;
+  }
+
+  // This is a border view.
+  $rect <20,20,160,60>
+  object Views::Border Border
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,0,240,95>;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Text
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <20,0,240,95>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "Climate Cabinet Menu Item";
+    preset Font = Climate::MediumFont;
+    preset Color = Climate::TextColor;
+  }
+
+  // This internal slot method is used to receive the corresponding signals form \
+  // the touch handler.
+  $rect <210,120,410,160>
+  slot enterLeaveSlot
+  {
+    InvalidateViewState();
+  }
+
+  // This internal slot method is used to receive the corresponding signals form \
+  // the touch handler.
+  $rect <210,160,410,200>
+  slot pressReleaseSlot
+  {
+    /* releasing the finger outside the button area is ignored */
+    if ( !TouchHandler.Down && TouchHandler.Inside )
+    {
+      /* inform the OnChange slot method */
+      signal OnChange;
+    }
+  }
+
+  // The property 'OnChange' can refer to a slot method, which will receive a signal \
+  // as soon the user has pressed the button. Thereupon the method's logic will be \
+  // executed.
+  $rect <410,160,610,200>
+  property slot OnChange = null;
+
+  // This property 'Caption' contains the title of the button.
+  $rect <270,10,470,50>
+  property string Caption = "";
+
+  $rect <270,50,470,90>
+  onset Caption
+  {
+    /* store the given value */
+    pure Caption = value;
+
+    /* forward the new caption */
+    Text.String = value;
+  }
+
+  // The property 'NextMenuItem' refers to the next item within a chained list of \
+  // menu items.
+  $rect <210,240,410,280>
+  property Climate::MenuItem NextMenuItem = null;
+
+  // The property 'NextDataItem' refers to the next item within a chained list of \
+  // data items. Each DataItem takes care, that its next DataItem will be placed \
+  // at the right side.
+  $rect <410,240,610,280>
+  property Climate::DataItem DataItem = null;
+
+  // This property is used to determine the type of the menu item (used for loop \
+  // arround animation).
+  $rect <470,10,670,50>
+  property Climate::MenuType Type = Climate::MenuType.TempHumid;
+
+  // This is an onset method.
+  $rect <410,280,610,320>
+  onset DataItem
+  {
+    pure DataItem = value;
+
+    /* adjust the asociated data item... */
+    if ( pure DataItem != null )
+      pure DataItem.Bounds.origin = point( Bounds.x2, Bounds.y1 );
+
+  }
+
+  // Slot method to trigger the next phase of the auto demo.
+  $rect <620,240,820,280>
+  slot AutoDemo
+  {
+    /* inform the OnChange slot method */
+    signal OnChange;
+  }
+
+  // The class 'MenuItem' represents a menu item of the climate cabinet demo. The \
+  // content of the menu item can be defined with the properties 'Caption' and 'Type'.
+  // As soons as the user presses the menu item, the 'OnChange' slot method gets \
+  // notified.
+  // 
+  // The menu items are organized in a chained list. The member 'NextMenuItem' refers \
+  // to the next menu item.
+  // Each menu item can be linked to a 'Climate::DataItem' by using the property \
+  // 'NextDataItem'. As soon as the position of the menu item has changed, the linked \
+  // data item will follow.
+  note legend Note
+  {
+    attr Bounds = <10,330,820,480>;
+  }
+}
+
+// This is a GUI component.
+$rect <240,180,440,220>
+$output false
+class DataItem : Core::Group
+{
+  $rect <10,260,210,300>
+  inherited onset Bounds
+  {
+    super( value );
+
+    /* adjust the next data item... */
+    if ( NextDataItem != null )
+      NextDataItem.Bounds.origin = point( Bounds.x2, Bounds.y1 );
+
+  }
+
+  $rect <10,220,210,260>
+  inherited property Bounds = <0,0,240,95>;
+
+  $rect <10,180,210,220>
+  inherited method UpdateLayout()
+  {
+    super( aSize );
+
+    /* divide height in 3:2 ratio */
+    var int32 y = aSize.y * 3 / 5;
+
+    /* arrange the text items */
+    ValueText.Bounds = rect( Climate::Spacing.x, 0, aSize.x, y );
+    DescrText.Bounds = rect( Climate::Spacing.x, y, aSize.x, aSize.y );
+
+
+  }
+
+  $rect <10,140,210,180>
+  inherited method UpdateViewState()
+  {
+    aState;
+
+    /* colorize background if currently selected */
+    if ( TouchHandler.Down && TouchHandler.Inside )
+      Background.Color = Climate::BorderColor;
+    else 
+      Background.Color = Climate::SelectColor;
+
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Background
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,0,240,95>;
+    preset Color = Climate::SelectColor;
+  }
+
+  $rect <20,20,160,60>
+  object Core::SimpleTouchHandler TouchHandler
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Point4 = <0,95>;
+    preset Point3 = <240,95>;
+    preset Point2 = <240,0>;
+    preset Point1 = <0,0>;
+    preset OnLeave = enterLeaveSlot;
+    preset OnEnter = enterLeaveSlot;
+    preset OnRelease = pressReleaseSlot;
+    preset OnPress = pressReleaseSlot;
+  }
+
+  // This is a border view.
+  $rect <20,20,160,60>
+  object Views::Border Border
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <-1,0,240,95>;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text DescrText
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, ResizeHorz];
+    preset Bounds = <20,60,240,95>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "Description";
+    preset Font = Climate::MediumFont;
+    preset Color = Climate::TextColor;
+  }
+
+  // This internal slot method is used to receive the corresponding signals form \
+  // the touch handler.
+  $rect <210,140,410,180>
+  slot enterLeaveSlot
+  {
+    InvalidateViewState();
+  }
+
+  // This internal slot method is used to receive the corresponding signals form \
+  // the touch handler.
+  $rect <210,180,410,220>
+  slot pressReleaseSlot
+  {
+    /* releasing the finger outside the button area is ignored */
+    if ( !TouchHandler.Down && TouchHandler.Inside )
+    {
+      /* inform the OnChange slot method */
+      signal OnChange;
+    }
+  }
+
+  // The property 'OnChange' can refer to a slot method, which will receive a signal \
+  // as soon the user has pressed the button. Thereupon the method's logic will be \
+  // executed.
+  $rect <460,180,660,220>
+  property slot OnChange = null;
+
+  // This property 'Caption' contains the title of the data field.
+  $rect <260,10,460,50>
+  property string Caption = "";
+
+  $rect <260,50,460,90>
+  onset Caption
+  {
+    /* store the given value */
+    pure Caption = value;
+
+    /* forward the new caption */
+    DescrText.String = value;
+  }
+
+  // The property 'NextDataItem' refers to the next item within a chained list of \
+  // data items. Each DataItem takes care, that its next DataItem will be placed \
+  // at the right side.
+  $rect <210,260,410,300>
+  property Climate::DataItem NextDataItem = null;
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text ValueText
+  {
+    preset Layout = Core::Layout[AlignToLeft, AlignToRight, AlignToTop, ResizeHorz];
+    preset Bounds = <20,0,240,60>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "100%%";
+    preset Font = Climate::LargeFont;
+    preset Color = Climate::TextColor;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image Image
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToRight];
+    preset Bounds = <215,70,230,85>;
+    preset Bitmap = Climate::Edge;
+  }
+
+  // The property 'Unit' contains the type of unit of the value that should be shown.
+  $rect <460,10,660,50>
+  property Climate::UnitType Unit = Climate::UnitType.Temperature;
+
+  $rect <460,50,660,90>
+  onset Unit
+  {
+    /* store the given value */
+    pure Unit = value;
+
+    /* force an update... */
+    postsignal onUpdate;
+  }
+
+  $rect <660,50,860,90>
+  onset ValueColor
+  {
+    /* check for any news... */
+    if ( value == pure ValueColor )
+      return;
+
+    /* store the new color value... */
+    pure ValueColor = value;
+
+    /* forward the new caption */
+    ValueText.Color = value;
+
+  }
+
+  // The property 'ValueColor' stores the color of the display value.
+  $rect <660,10,860,50>
+  property color ValueColor = #FFFFFFFF;
+
+  // The property 'DataPoint' refers to the value that should be displayed.
+  $rect <460,90,660,130>
+  property ^int32 DataPoint = null;
+
+  $rect <460,130,660,170>
+  onset DataPoint
+  {
+    /* check if something has changed */
+    if ( value == pure DataPoint )
+      return;
+
+    /* detatch from previous data point */
+    if ( pure DataPoint != null )
+      detachobserver onUpdate, pure DataPoint;
+
+    /* store the new data point */
+    pure DataPoint = value;
+
+    /* and attach to the new one */
+    if ( value != null )
+      attachobserver onUpdate, value;
+
+    /* finally, get the initial value */
+    postsignal onUpdate;
+  }
+
+  // Slot method to update the display value.
+  $rect <660,130,860,170>
+  slot onUpdate
+  {
+    sender; /* the method is called from the sender object */
+
+    /* format the new text to be displayed */
+    if ( pure DataPoint != null ) switch ( Unit )
+    {
+      case Climate::UnitType.Time:
+      {
+        var int32 h = (DataPoint^) / 60;
+        var int32 m = (DataPoint^) - h * 60;
+        ValueText.String = string( h ) + ":" + string( m, 2 ) + "h";
+      }
+      case Climate::UnitType.Temperature:
+      {
+        ValueText.String = string( DataPoint^ ) + "°C";
+      }
+      case Climate::UnitType.Percent:
+      {
+        ValueText.String = string( DataPoint^ ) + "%%";
+      }
+      default:
+       ;
+    }
+    else
+      ValueText.String = "---";
+
+
+  }
+
+  // The property MinValue defines the lower boundary of the widgets value range.
+  $rect <460,260,660,300>
+  property int32 MinValue = 0;
+
+  // The property MaxValue defines the upper boundary of the widgets value range.
+  $rect <660,260,860,300>
+  property int32 MaxValue = 100;
+
+  // Slot method to trigger the next phase of the auto demo.
+  $rect <210,310,410,350>
+  slot AutoDemo
+  {
+    /* inform the OnChange slot method */
+    signal OnChange;
+  }
+
+  // The class 'DataItem' displays the current value of a connected data point. The \
+  // appearance can be configured with the properties 'Caption', 'Unit' and 'ValueColor'.
+  // 
+  // Additionally, this class behaves as a button. As soon as the user presses the \
+  // item, the 'OnChange' slot method gets notified.
+  // 
+  // A 'DataItem' can be linked to another one by using the property 'NextDataItem'. \
+  // As soon as the position of the 'DataItem' has changed, the linked item will \
+  // follow.
+  note legend Note
+  {
+    attr Bounds = <10,360,860,510>;
+  }
+}
+
+// This is an enumeration definition for signing the different menu items.
+$rect <40,130,240,170>
+$output false
+enum MenuType
+{
+  $rect <10,10,150,50>
+  item TempHumid;
+
+  $rect <160,10,300,50>
+  item DwellTime;
+
+  $rect <310,10,450,50>
+  item HeatCool;
+}
+
+// Controller class, containing all data set values and all current values of the \
+// climate cabinet.
+$rect <40,370,240,410>
+$output false
+class DeviceClass
+{
+  // Dwell time in minutes.
+  $rect <10,10,210,50>
+  property int32 DwellTime = 240;
+
+  $rect <10,50,210,90>
+  onset DwellTime
+  {
+    // Implement here your ON SET business logic, the access to the hardware,
+    // or any desired code to execute, when the property is written at the
+    // runtime.
+
+    /* check limits of given value */
+    if ( value < 10 )
+      value = 10;
+    if ( value > 760 )
+      value = 760;
+
+    /* check for new value */
+    if ( value == pure DwellTime )
+      return;
+
+    pure DwellTime = value;
+
+    notifyobservers ^DwellTime;
+  }
+
+  // Heating time in minutes.
+  $rect <220,10,420,50>
+  property int32 HeatTime = 30;
+
+  $rect <220,50,420,90>
+  onset HeatTime
+  {
+    // Implement here your ON SET business logic, the access to the hardware,
+    // or any desired code to execute, when the property is written at the
+    // runtime.
+
+    /* check limits of given value */
+    if ( value < 10 )
+      value = 10;
+    if ( value > 120 )
+      value = 120;
+
+    /* check for new value */
+    if ( value == pure HeatTime )
+      return;
+
+    pure HeatTime = value;
+
+    notifyobservers ^HeatTime;
+  }
+
+  // Cooling time in minutes.
+  $rect <430,10,630,50>
+  property int32 CoolTime = 45;
+
+  $rect <430,50,630,90>
+  onset CoolTime
+  {
+    // Implement here your ON SET business logic, the access to the hardware,
+    // or any desired code to execute, when the property is written at the
+    // runtime.
+
+    /* check limits of given value */
+    if ( value < 10 )
+      value = 10;
+    if ( value > 120 )
+      value = 120;
+
+    /* check for new value */
+    if ( value == pure CoolTime )
+      return;
+
+    pure CoolTime = value;
+
+    notifyobservers ^CoolTime;
+  }
+
+  // Nominal temperature in degrees.
+  $rect <10,110,210,150>
+  property int32 NominalTemp = 79;
+
+  $rect <10,150,210,190>
+  onset NominalTemp
+  {
+    // Implement here your ON SET business logic, the access to the hardware,
+    // or any desired code to execute, when the property is written at the
+    // runtime.
+
+    /* check limits of given value */
+    if ( value < 0 )
+      value = 0;
+    if ( value > 100 )
+      value = 100;
+
+    /* check for new value */
+    if ( value == pure NominalTemp )
+      return;
+
+    pure NominalTemp = value;
+
+    notifyobservers ^NominalTemp;
+  }
+
+  // Actual temperature in degrees.
+  $rect <220,110,420,150>
+  property int32 ActualTemp = 0;
+
+  $rect <220,150,420,190>
+  onset ActualTemp
+  {
+    // Implement here your ON SET business logic, the access to the hardware,
+    // or any desired code to execute, when the property is written at the
+    // runtime.
+
+    /* check limits of given value */
+    if ( value < 0 )
+      value = 0;
+    if ( value > 100 )
+      value = 100;
+
+    /* check for new value */
+    if ( value == pure ActualTemp )
+      return;
+
+    pure ActualTemp = value;
+
+    notifyobservers ^ActualTemp;
+  }
+
+  // Humidity in percent.
+  $rect <430,110,630,150>
+  property int32 Humidity = 50;
+
+  $rect <430,150,630,190>
+  onset Humidity
+  {
+    // Implement here your ON SET business logic, the access to the hardware,
+    // or any desired code to execute, when the property is written at the
+    // runtime.
+
+    /* check limits of given value */
+    if ( value < 0 )
+      value = 0;
+    if ( value > 100 )
+      value = 100;
+
+    /* check for new value */
+    if ( value == pure Humidity )
+      return;
+
+    pure Humidity = value;
+
+    notifyobservers ^Humidity;
+  }
+
+  // Flag to start/stop the climate cabinet.
+  $rect <10,220,210,260>
+  property bool Running = false;
+
+  $rect <10,260,210,300>
+  onset Running
+  {
+    // Implement here your ON SET business logic, the access to the hardware,
+    // or any desired code to execute, when the property is written at the
+    // runtime.
+
+    /* check for new value */
+    if ( value == pure Running )
+      return;
+
+    pure Running = value;
+
+    notifyobservers ^Running;
+
+    /* start animation for simulation */
+    if ( value )
+    {
+      RemainingTime = pure HeatTime + pure DwellTime + pure CoolTime;
+      ActualTemp = 0;
+      Timer.Enabled = true;
+    }
+    else
+      Timer.Enabled = false;
+
+  }
+
+  // Remaining time in minutes, when machine is running.
+  $rect <640,10,840,50>
+  property int32 RemainingTime = 500;
+
+  $rect <640,50,840,90>
+  onset RemainingTime
+  {
+    // Implement here your ON SET business logic, the access to the hardware,
+    // or any desired code to execute, when the property is written at the
+    // runtime.
+
+    /* check limits of given value */
+    if ( value < 0 )
+      value = 0;
+    if ( value > 1000 )
+      value = 1000;
+
+    /* check for new value */
+    if ( value == pure RemainingTime )
+      return;
+
+    pure RemainingTime = value;
+
+    notifyobservers ^RemainingTime;
+
+
+  }
+
+  // This is a timer object.
+  $rect <220,220,420,260>
+  object Core::Timer Timer
+  {
+    preset OnTrigger = Animate;
+    preset Period = 250;
+  }
+
+  // This is a slot method.
+  $rect <220,260,420,300>
+  slot Animate
+  {
+    sender; /* the method is called from the sender object */
+
+    RemainingTime = RemainingTime - 1;
+    if ( RemainingTime == 0 )
+      Running = false;
+    else
+    {
+      var int32 delta = pure HeatTime + pure DwellTime + pure CoolTime - pure RemainingTime;
+      
+      /* check if heating is ongoing */
+      if ( delta < pure HeatTime )
+        ActualTemp = pure NominalTemp * delta / pure HeatTime;
+
+      /* check if cooling is ongoing */
+      else if ( pure RemainingTime < pure CoolTime )
+        ActualTemp = pure NominalTemp * pure RemainingTime / pure CoolTime;
+       
+      /* otherwise we are in the dwell zone */
+      else
+        ActualTemp = pure NominalTemp;
+    }
+  }
+
+  // This is the device class of the climate cabinet. It is the interface to the \
+  // "real" hardware.
+  // 
+  // Within this demo application a timer triggered animation method makes a simple \
+  // simulation of some heating and cooling progress, while the machine is running. 
+  note legend Note
+  {
+    attr Bounds = <10,310,630,420>;
+  }
+
+  // How to integrate your UI application with a real device?
+  // 
+  // https://doc.embedded-wizard.de/integrating-with-the-device
+  // https://doc.embedded-wizard.de/device-class-and-device-driver
+  note legend Note5
+  {
+    attr Bounds = <10,430,630,520>;
+  }
+}
+
+$rect <240,370,440,410>
+$output false
+autoobject Climate::DeviceClass Device;
+
+// This is a GUI component.
+$rect <240,80,440,120>
+$output false
+class Diagram : Core::Group
+{
+  // This is a generic touch handler.
+  $rect <20,20,160,60>
+  object Core::SimpleTouchHandler SimpleTouchHandler
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Point4 = <0,375>;
+    preset Point3 = <540,375>;
+    preset Point2 = <540,0>;
+    preset Point1 = <0,0>;
+  }
+
+  $rect <10,390,210,430>
+  inherited property Bounds = <0,0,540,375>;
+
+  $rect <210,390,410,430>
+  inherited method UpdateLayout()
+  {
+    super( aSize );
+
+    /* calculate upper and lower position according size of wiper */
+    var int32 y1 = WallpaperTop.Bitmap.FrameSize.y;
+    var int32 y2 = aSize.y - WallpaperBottom.Bitmap.FrameSize.y;
+
+    /* arrange wallpapers and  diagram */
+    WallpaperTop.Bounds = rect( 0, 0, aSize.x, y1 );
+    WallpaperBottom.Bounds = rect( 0, y2, aSize.x, aSize.y );
+    Graph.Bounds = rect( 2 * Climate::Spacing.x, y1, aSize.x - Climate::Spacing.x, y2 - Climate::Spacing.y );
+    Rectangle.Bounds = rect( 0, y1, aSize.x, y2 );
+
+    /* arrange left scaling text */
+    var rect r = rect( 0, y1, 2 * Climate::Spacing.x - 3, y1 + Climate::Spacing.y );
+    UnitC.Bounds = r;
+    C4.Bounds = r;
+    C3.Bounds = r;
+    C2.Bounds = r;
+    C1.Bounds = r;
+
+    /* arrange lower scaling text */
+    r = rect( aSize.x - Climate::Spacing.x - 3 * Climate::Spacing.x, y2 - Climate::Spacing.y, aSize.x - Climate::Spacing.x, y2 );
+    UnitT.Bounds = r;
+    T4.Bounds = r;
+    T3.Bounds = r;
+    T2.Bounds = r;
+    T1.Bounds = r;
+
+  }
+
+  $rect <410,390,610,430>
+  inherited method UpdateViewState()
+  {
+    aState;
+
+    var int32 totalTime = (Climate::Device.HeatTime) + (Climate::Device.DwellTime) + (Climate::Device.CoolTime);
+    var int32 rangeTime = 0;
+
+    /* determine best fitting time range for horizontal direction */
+    if ( totalTime < 25 )
+      rangeTime = 25;
+    else if ( totalTime < 50 )
+      rangeTime = 50;
+    else if ( totalTime < 75 )
+      rangeTime = 75;
+    else if ( totalTime < 100 )
+      rangeTime = 100;
+    else if ( totalTime < 150 )
+      rangeTime = 150;
+    else if ( totalTime < 300 )
+      rangeTime = 300;
+    else if ( totalTime < 600 )
+      rangeTime = 600;
+    else
+      rangeTime = 1200;
+
+    /* adjust scale text */
+    T1.String = string( rangeTime / 5 * 1 );
+    T2.String = string( rangeTime / 5 * 2 );
+    T3.String = string( rangeTime / 5 * 3 );
+    T4.String = string( rangeTime / 5 * 4 );
+
+    /* create coordinates - complete area in horz/vert direction is used for range 0.0 to 1.0 */
+    var Charts::CoordList coords = new Charts::CoordList;
+
+    var float x1 = (float)(Climate::Device.HeatTime) / (float)rangeTime;
+    var float x2 = (float)((Climate::Device.HeatTime) + (Climate::Device.DwellTime)) / (float)rangeTime;
+    var float x3 = (float)(totalTime) / (float)rangeTime;
+    var float y = (float)(Climate::Device.NominalTemp) / 100.0;
+
+    coords.AddCoord( -x1, -y );
+    coords.AddCoord( x1, y );
+    coords.AddCoord( x2, y );
+    coords.AddCoord( x3, 0.0 );
+
+    /* configure diagram */
+    var point grid = point( Graph.Bounds.w / 5, Graph.Bounds.h / 5);
+    Graph.GridDistance = grid;
+    Graph.CoordOrigin = point( 0, Graph.Bounds.h );
+    Graph.PixelPerUnit = point( Graph.Bounds.w, -Graph.Bounds.h );
+    Graph.Coordinates = coords;
+
+    /* adjust humidity value */
+    var int32 humPos = Graph.Bounds.y2 - ( Climate::Device.Humidity * Graph.Bounds.h / 100 );
+    HumidityBar.Bounds = rect( Graph.Bounds.x1, humPos - 1, Graph.Bounds.x2, humPos + 1 );
+    HumidText.String = string( Climate::Device.Humidity ) + "%%";
+    HumidText.Bounds.origin = point( HumidityBar.Bounds.x2 - HumidText.Bounds.w, humPos - HumidText.Bounds.h );
+
+    /* calculate the center postion of the dwell line => needed for positioning of description */
+    var int32 centerX = Graph.Bounds.x1 + ((Climate::Device.HeatTime) + (Climate::Device.DwellTime) / 2 ) * Graph.Bounds.w / rangeTime;
+    var int32 centerY = Graph.Bounds.y2 - ( Climate::Device.NominalTemp * Graph.Bounds.h / 100 );
+    TempText.String = string( Climate::Device.NominalTemp ) + "°C";
+    TempText.Bounds.origin = point( centerX - DwellText.Bounds.w / 2, centerY - TempText.Bounds.h );
+
+    var int32 h = (Climate::Device.DwellTime) / 60;
+    var int32 m = (Climate::Device.DwellTime) - h * 60;
+    DwellText.String = string( h ) + ":" + string( m, 2 ) + "h";
+    DwellText.Bounds.origin = point( centerX - DwellText.Bounds.w / 2, Graph.Bounds.y2 - DwellText.Bounds.h );
+
+    /* calculate position of dashed lines */
+    HeatLine.Bounds.x1 = Graph.Bounds.x1 + (Climate::Device.HeatTime) * Graph.Bounds.w / rangeTime;
+    HeatLine.Bounds.x2 = HeatLine.Bounds.x1 + 2;
+    HeatLine.Bounds.y1 = centerY + 10;
+    HeatLine.Bounds.y2 = Graph.Bounds.y2;
+
+    CoolLine.Bounds.x1 = Graph.Bounds.x1 + ((Climate::Device.HeatTime) + (Climate::Device.DwellTime)) * Graph.Bounds.w / rangeTime;
+    CoolLine.Bounds.x2 = CoolLine.Bounds.x1 + 2;
+    CoolLine.Bounds.y1 = centerY + 10;
+    CoolLine.Bounds.y2 = Graph.Bounds.y2;
+
+    DwellLine.Bounds.x1 = HeatLine.Bounds.x2;
+    DwellLine.Bounds.x2 = CoolLine.Bounds.x1;
+    DwellLine.Bounds.y1 = Graph.Bounds.y2 - 2;
+    DwellLine.Bounds.y2 = Graph.Bounds.y2;
+
+    /* arrange scale text items */
+    T1.Bounds.origin.x = Graph.Bounds.x1 + grid.x - T1.Bounds.w / 2;
+    T2.Bounds.origin.x = T1.Bounds.x1 + grid.x;
+    T3.Bounds.origin.x = T2.Bounds.x1 + grid.x;
+    T4.Bounds.origin.x = T3.Bounds.x1 + grid.x;
+
+    C4.Bounds.origin.y = Graph.Bounds.y1 + grid.y - C4.Bounds.h / 2;
+    C3.Bounds.origin.y = C4.Bounds.y1 + grid.y;
+    C2.Bounds.origin.y = C3.Bounds.y1 + grid.y;
+    C1.Bounds.origin.y = C2.Bounds.y1 + grid.y;
+
+    /* adjust running bar */
+    RunningBar.Visible = (Climate::Device.Running);
+    RunningBar.Bounds.origin = point( Graph.Bounds.x1 + (totalTime - (Climate::Device.RemainingTime)) * Graph.Bounds.w / rangeTime, Graph.Bounds.y1 );
+    RunningBar.Bounds.h = Graph.Bounds.h;
+
+
+  }
+
+  // This is a wallpaper view.
+  $rect <20,20,160,60>
+  object Views::Wallpaper WallpaperTop
+  {
+    preset Layout = Core::Layout[AlignToLeft, AlignToRight, AlignToTop, ResizeHorz];
+    preset Bounds = <0,0,540,20>;
+    preset Color = Climate::BackColor;
+    preset Bitmap = Climate::Wiper;
+  }
+
+  // This is a wallpaper view.
+  $rect <20,20,160,60>
+  object Views::Wallpaper WallpaperBottom
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, ResizeHorz];
+    preset Bounds = <0,355,540,375>;
+    preset Color = Climate::BackColor;
+    preset FrameNumber = 1;
+    preset Bitmap = Climate::Wiper;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,20,540,355>;
+    preset Color = Climate::BackColor;
+  }
+
+  $rect <20,20,160,60>
+  object Charts::Graph Graph
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <40,40,521,336>;
+    preset LineColor = Climate::GraphColor;
+    preset LineWidth = 4;
+    preset DotColor = Climate::GraphColor;
+    preset DotWidth = 12;
+    preset BackColor = Climate::SelectColor;
+    preset HorzGridColor = Climate::BorderColor;
+    preset VertGridColor = #000000FF;
+    preset GridDistance = <96,59>;
+    preset DotBitmap = Charts::Dots12x12;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text T1
+  {
+    preset Layout = Core::Layout[AlignToBottom];
+    preset Bounds = <117,334,157,354>;
+    preset String = "120";
+    preset Font = Climate::SmallFont;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text T2
+  {
+    preset Layout = Core::Layout[AlignToBottom];
+    preset Bounds = <213,334,253,354>;
+    preset String = "240";
+    preset Font = Climate::SmallFont;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text T3
+  {
+    preset Layout = Core::Layout[AlignToBottom];
+    preset Bounds = <309,334,349,354>;
+    preset String = "360";
+    preset Font = Climate::SmallFont;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text T4
+  {
+    preset Layout = Core::Layout[AlignToBottom];
+    preset Bounds = <406,334,446,354>;
+    preset String = "480";
+    preset Font = Climate::SmallFont;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text UnitT
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToRight];
+    preset Bounds = <489,334,529,354>;
+    preset Alignment = Views::TextAlignment[AlignHorzRight, AlignVertCenter];
+    preset String = "min";
+    preset Font = Climate::SmallFont;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text C1
+  {
+    preset Layout = Core::Layout[AlignToLeft];
+    preset Bounds = <7,267,37,287>;
+    preset Alignment = Views::TextAlignment[AlignHorzRight, AlignVertCenter];
+    preset String = "20";
+    preset Font = Climate::SmallFont;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text C2
+  {
+    preset Layout = Core::Layout[AlignToLeft];
+    preset Bounds = <7,208,37,228>;
+    preset Alignment = Views::TextAlignment[AlignHorzRight, AlignVertCenter];
+    preset String = "40";
+    preset Font = Climate::SmallFont;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text C3
+  {
+    preset Layout = Core::Layout[AlignToLeft];
+    preset Bounds = <7,149,37,169>;
+    preset Alignment = Views::TextAlignment[AlignHorzRight, AlignVertCenter];
+    preset String = "60";
+    preset Font = Climate::SmallFont;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text C4
+  {
+    preset Layout = Core::Layout[AlignToLeft];
+    preset Bounds = <7,90,37,110>;
+    preset Alignment = Views::TextAlignment[AlignHorzRight, AlignVertCenter];
+    preset String = "80";
+    preset Font = Climate::SmallFont;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text UnitC
+  {
+    preset Layout = Core::Layout[AlignToLeft, AlignToTop];
+    preset Bounds = <7,38,37,58>;
+    preset Alignment = Views::TextAlignment[AlignHorzRight, AlignVertCenter];
+    preset String = "°C";
+    preset Font = Climate::SmallFont;
+    preset Color = Climate::BorderColor;
+  }
+
+  // Slot method to update the display value.
+  $rect <570,340,770,380>
+  slot onUpdate
+  {
+    sender;
+
+    InvalidateViewState();
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle HumidityBar
+  {
+    preset Bounds = <40,130,520,132>;
+    preset Color = Climate::HumidityColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text HumidText
+  {
+    preset Bounds = <420,90,506,120>;
+    preset String = "xx%%";
+    preset Font = Climate::MediumFont;
+    preset Color = Climate::HumidityColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text DwellText
+  {
+    preset Bounds = <190,260,280,294>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "xxmin";
+    preset Font = Climate::MediumFont;
+    preset Color = Climate::TextColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text TempText
+  {
+    preset Bounds = <210,60,300,94>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "xx°C";
+    preset Font = Climate::MediumFont;
+    preset Color = Climate::GraphColor;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image HeatLine
+  {
+    preset Bounds = <120,240,122,335>;
+    preset Color = Climate::TextColor;
+    preset Bitmap = Climate::DashLineV;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image CoolLine
+  {
+    preset Bounds = <370,240,372,335>;
+    preset Color = Climate::TextColor;
+    preset Bitmap = Climate::DashLineV;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image DwellLine
+  {
+    preset Bounds = <140,320,340,322>;
+    preset Color = Climate::TextColor;
+    preset Bitmap = Climate::DashLineH;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle RunningBar
+  {
+    preset Bounds = <50,20,52,336>;
+    preset Color = Climate::StartColor;
+  }
+
+  // Handler to get notifications when 'DwellTime' property of the decive has changed.
+  $rect <570,10,770,50>
+  object Core::PropertyObserver DwellTimeObserver
+  {
+    preset OnEvent = onUpdate;
+    preset Outlet = ^Climate::Device.DwellTime;
+  }
+
+  // Handler to get notifications when 'DwellTime' property of the decive has changed.
+  $rect <570,50,770,90>
+  object Core::PropertyObserver HeatTimeObserver
+  {
+    preset OnEvent = onUpdate;
+    preset Outlet = ^Climate::Device.HeatTime;
+  }
+
+  // Handler to get notifications when 'CoolTime' property of the decive has changed.
+  $rect <570,90,770,130>
+  object Core::PropertyObserver CoolTimeObserver
+  {
+    preset OnEvent = onUpdate;
+    preset Outlet = ^Climate::Device.CoolTime;
+  }
+
+  // Handler to get notifications when 'NominalTemp' property of the decive has changed.
+  $rect <570,130,770,170>
+  object Core::PropertyObserver NominalTempObserver
+  {
+    preset OnEvent = onUpdate;
+    preset Outlet = ^Climate::Device.NominalTemp;
+  }
+
+  // Handler to get notifications when 'NominalTemp' property of the decive has changed.
+  $rect <570,170,770,210>
+  object Core::PropertyObserver HumidityObserver
+  {
+    preset OnEvent = onUpdate;
+    preset Outlet = ^Climate::Device.Humidity;
+  }
+
+  // Handler to get notifications when 'ActualTemp' property of the decive has changed.
+  $rect <570,210,770,250>
+  object Core::PropertyObserver ActualTempObserver
+  {
+    preset OnEvent = onUpdate;
+    preset Outlet = ^Climate::Device.ActualTemp;
+  }
+
+  // Handler to get notifications when 'ReminaingTime' property of the decive has \
+  // changed.
+  $rect <570,250,770,290>
+  object Core::PropertyObserver RemainingTimeObserver
+  {
+    preset OnEvent = onUpdate;
+    preset Outlet = ^Climate::Device.RemainingTime;
+  }
+
+  // Handler to get notifications when 'Running' property of the decive has changed.
+  $rect <570,290,770,330>
+  object Core::PropertyObserver RunningObserver
+  {
+    preset OnEvent = onUpdate;
+    preset Outlet = ^Climate::Device.Running;
+  }
+
+  // The class 'Diagram' shows the current parameter of the climate cabinet, like \
+  // heat time, dwell time, cool time, nominal temperature or humidity.
+  // 
+  // For this purpose, a couple of property observers are used to listen on the corresponding \
+  // values of the device. Each time a value has changed, the diagram will be updated.
+  // 
+  // The temperature / time function is drawn by using a 'Charts::Graph' object. \
+  // Within the method 'UpdateViewState()' the coordinates are calculated and set \
+  // to the graph object. Additionally, the position of the dot line and some description \
+  // texts are updated.
+  note legend Note1
+  {
+    attr Bounds = <10,450,770,630>;
+  }
+
+  // Directives to adapt the order of members belonging to this class so they appear 
+  // correctly arranged relative to the members inherited from the ancestor (super) 
+  // classes. The numbers indicate the order-displacement to apply on the respective 
+  // member once all members have been loaded and combined with members from the 
+  // ancestor classes.
+  $reorder SimpleTouchHandler 75
+}
+
+// This is a GUI component.
+$rect <40,220,240,260>
+$output false
+class StartButton : Core::Group
+{
+  $rect <10,240,210,280>
+  inherited property Bounds = <0,0,240,135>;
+
+  $rect <10,200,210,240>
+  inherited method UpdateLayout()
+  {
+    super( aSize );
+
+    /* get upper starting point */
+    var int32 y = Wallpaper.Bitmap.FrameSize.y;
+
+    /* arrange all members within the button */
+    Wallpaper.Bounds = rect( 0, 0, aSize.x, y );
+    Rectangle.Bounds = rect( 0, y, aSize.x, aSize.y );
+    Background.Bounds = rect( 0, y, aSize.x, aSize.y - Climate::Spacing.y );
+    Border.Bounds = Background.Bounds;
+    Text.Bounds = rect( Climate::Spacing.x, Climate::Spacing.y, aSize.x, aSize.y - Climate::Spacing.y );
+    TouchHandler.Point1 = point( 0, y );
+    TouchHandler.Point2 = point( aSize.x, y );
+    TouchHandler.Point3 = point( aSize.x, aSize.y );
+    TouchHandler.Point4 = point( 0, aSize.y );
+
+
+
+
+
+  }
+
+  $rect <10,160,210,200>
+  inherited method UpdateViewState()
+  {
+    aState;
+
+    if ( IsRunning == null )
+      return;
+
+    /* change the caption of the button */
+    if ( IsRunning^ )
+      Text.String = "Stop";
+    else
+      Text.String = "Start";
+
+
+    /* colorize background if currently selected */
+    if ( TouchHandler.Down && TouchHandler.Inside )
+      Background.Color = Climate::BorderColor;
+    else 
+    {
+      if ( IsRunning^ )
+        Background.Color = Climate::BorderColor;
+      else
+        Background.Color = Climate::StartColor;
+    }
+
+  }
+
+  // This is a wallpaper view.
+  $rect <20,20,160,60>
+  object Views::Wallpaper Wallpaper
+  {
+    preset Layout = Core::Layout[AlignToLeft, AlignToRight, AlignToTop, ResizeHorz];
+    preset Bounds = <0,0,240,20>;
+    preset Color = Climate::BackColor;
+    preset Bitmap = Climate::Wiper;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,20,240,135>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Background
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,20,240,115>;
+    preset Color = Climate::StartColor;
+  }
+
+  $rect <20,20,160,60>
+  object Core::SimpleTouchHandler TouchHandler
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Point4 = <0,115>;
+    preset Point3 = <240,115>;
+    preset Point2 = <240,20>;
+    preset Point1 = <0,20>;
+    preset OnLeave = enterLeaveSlot;
+    preset OnEnter = enterLeaveSlot;
+    preset OnRelease = pressReleaseSlot;
+    preset OnPress = pressReleaseSlot;
+  }
+
+  // This is a border view.
+  $rect <20,20,160,60>
+  object Views::Border Border
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,20,240,115>;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Text
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <20,10,240,120>;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "Start";
+    preset Font = Climate::LargeFont;
+    preset Color = Climate::TextColor;
+  }
+
+  // This internal slot method is used to receive the corresponding signals form \
+  // the touch handler.
+  $rect <210,160,410,200>
+  slot enterLeaveSlot
+  {
+    InvalidateViewState();
+  }
+
+  // This internal slot method is used to receive the corresponding signals form \
+  // the touch handler.
+  $rect <210,200,410,240>
+  slot pressReleaseSlot
+  {
+    /* releasing the finger outside the button area is ignored */
+    if ( !TouchHandler.Down && TouchHandler.Inside )
+    {
+      if ( IsRunning != null )
+        IsRunning^ = !IsRunning^; 
+
+      /* inform the slot method */
+      signal OnAction;
+    }
+  }
+
+  // The property 'OnAction' can refer to a slot method, which will receive a signal \
+  // as soon the user has pressed the button. Thereupon the method's logic will be \
+  // executed.
+  $rect <410,200,610,240>
+  property slot OnAction = null;
+
+  // Data point property that refers to the value that should be displayed within \
+  // the diagram.
+  $rect <260,10,460,50>
+  property ^bool IsRunning = null;
+
+  $rect <260,50,460,90>
+  onset IsRunning
+  {
+    /* check if something has changed */
+    if ( value == pure IsRunning )
+      return;
+
+    /* detatch from previous data point */
+    if ( pure IsRunning != null )
+      detachobserver onUpdate, pure IsRunning;
+
+    /* store the new data point */
+    pure IsRunning = value;
+
+    /* and attach to the new one */
+    if ( value != null )
+      attachobserver onUpdate, value;
+
+    /* finally, get the initial value */
+    postsignal onUpdate;
+  }
+
+  // Slot method to update the display value.
+  $rect <260,90,460,130>
+  slot onUpdate
+  {
+    sender;
+
+    InvalidateViewState();
+    signal OnAction;
+
+  }
+
+  // The class 'StartButton' implements a simple toggle button to start and stop \
+  // the climate cabinet.
+  // Each time the user has pressed the button, the value referred by the outlet \
+  // property 'IsRunning' will be changed and the button is redrawn. 
+  note legend Note
+  {
+    attr Bounds = <10,290,610,400>;
+  }
+}
+
+// This is a GUI component.
+$rect <240,220,440,260>
+$output false
+class StatusBar : Core::Group
+{
+  $rect <10,120,210,160>
+  inherited property Bounds = <0,0,520,95>;
+
+  $rect <220,120,420,160>
+  inherited method UpdateLayout()
+  {
+    super( aSize );
+
+    var int32 dx = Climate::Spacing.x / 2;
+
+    /* divide height in 3:2 ratio */
+    var int32 y = aSize.y * 3 / 5;
+
+    /* divide status bar into three parts */
+    var int32 x1 = aSize.x * 7 / 26;
+    var int32 x2 = ( aSize.x - x1 ) / 2 + x1;
+
+    /* arrange operation info field */
+    RectOp.Bounds = rect( 0, 0, x1, aSize.y );
+    TextOp.Bounds = RectOp.Bounds;
+
+    Line.Point1 = point( x1, 0 );
+    Line.Point2 = point( x1, aSize.y );
+
+    /* arrange current temp */
+    ValueTemp.Bounds = rect( x1 + dx, 0, x2, y );
+    TextTemp.Bounds = rect( x1 + dx, y, x2, aSize.y );
+
+    Line0.Point1 = point( x2, 0 );
+    Line0.Point2 = point( x2, aSize.y );
+
+    /* arrange remaining time */
+    ValueTime.Bounds = rect( x2 + dx, 0, aSize.x, y );
+    TextTime.Bounds = rect( x2 + dx, y, aSize.x, aSize.y );
+
+
+                            
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Background
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,0,520,95>;
+    preset Color = Climate::SelectColor;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle RectOp
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToTop, ResizeVert];
+    preset Bounds = <0,0,140,95>;
+    preset Color = Climate::StartColor;
+  }
+
+  // This is a border view.
+  $rect <20,20,160,60>
+  object Views::Border Border
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <-1,0,520,95>;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text TextTime
+  {
+    preset Layout = Core::Layout[AlignToTop, ResizeHorz];
+    preset Bounds = <340,60,520,95>;
+    preset Ellipsis = true;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "Remaining Time";
+    preset Font = Climate::MediumFont;
+    preset Color = Climate::TextColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text ValueTime
+  {
+    preset Layout = Core::Layout[AlignToTop, ResizeHorz];
+    preset Bounds = <340,0,520,60>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "999min";
+    preset Font = Climate::LargeFont;
+    preset Color = Climate::TextColor;
+  }
+
+  // Slot method to update the display value.
+  $rect <540,120,740,160>
+  slot onUpdate
+  {
+    sender; /* the method is called from the sender object */
+
+    /* create the new text to be displayed */
+    var int32 h = (Climate::Device.RemainingTime) / 60;
+    var int32 m = (Climate::Device.RemainingTime) - h * 60;
+    ValueTime.String = string( h ) + ":" + string( m, 2 ) + "h";
+
+    ValueTemp.String = string( Climate::Device.ActualTemp ) + "°C";
+
+    TextOp.Visible = Climate::Device.Running;
+    RectOp.Visible = Climate::Device.Running;
+      
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text TextTemp
+  {
+    preset Layout = Core::Layout[AlignToTop, ResizeHorz];
+    preset Bounds = <150,60,330,95>;
+    preset Ellipsis = true;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "Current Temp";
+    preset Font = Climate::MediumFont;
+    preset Color = Climate::TextColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text ValueTemp
+  {
+    preset Layout = Core::Layout[AlignToTop, ResizeHorz];
+    preset Bounds = <150,0,330,60>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "100°C";
+    preset Font = Climate::LargeFont;
+    preset Color = Climate::GraphColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToTop, ResizeVert];
+    preset Point2 = <140,100>;
+    preset Point1 = <140,0>;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line0
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToTop, ResizeVert];
+    preset Point2 = <330,100>;
+    preset Point1 = <330,0>;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text TextOp
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToTop, ResizeVert];
+    preset Bounds = <0,0,140,95>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "In\nOperation";
+    preset Font = Climate::MediumFont;
+    preset Color = Climate::TextColor;
+  }
+
+  // The class 'StatusBar' informs the user about the current running state, the \
+  // actual temperature and the remaining time.
+  // 
+  // For this purpose, three property observers are used to listen on the corresponding \
+  // values of the device. Each time a value has changed, the status bar will be \
+  // updated.
+  note legend Note
+  {
+    attr Bounds = <10,170,740,290>;
+  }
+
+  // Handler to get notifications when 'ReminaingTime' property of the decive has \
+  // changed.
+  $rect <540,0,740,40>
+  object Core::PropertyObserver RemainingTimeObserver
+  {
+    preset OnEvent = onUpdate;
+    preset Outlet = ^Climate::Device.RemainingTime;
+  }
+
+  // Handler to get notifications when 'ActualTemp' property of the decive has changed.
+  $rect <540,40,740,80>
+  object Core::PropertyObserver ActualTempObserver
+  {
+    preset OnEvent = onUpdate;
+    preset Outlet = ^Climate::Device.ActualTemp;
+  }
+
+  // Handler to get notifications when 'Running' property of the decive has changed.
+  $rect <540,80,740,120>
+  object Core::PropertyObserver RunningObserver
+  {
+    preset OnEvent = onUpdate;
+    preset Outlet = ^Climate::Device.Running;
+  }
+}
+
+// This is an enumeration definition for the different unit types used for displaying \
+// values.
+$rect <240,130,440,170>
+$output false
+enum UnitType
+{
+  $rect <10,10,150,50>
+  item Time;
+
+  $rect <160,10,300,50>
+  item Percent;
+
+  $rect <310,10,450,50>
+  item Temperature;
+}
+
+// Slider item to change a temperature or time value.
+$rect <40,260,240,300>
+$output false
+class SliderItem : Core::Group
+{
+  $rect <10,210,210,250>
+  inherited property Bounds = <0,0,568,95>;
+
+  $rect <10,120,210,160>
+  inherited method UpdateLayout()
+  {
+    super( aSize );
+
+    /* calculate position of buttons */
+    var int32 x1 = Climate::MenuItemSize.x * 1 / 5;
+    var int32 x2 = aSize.x - x1;
+    var int32 y = aSize.y / 2;
+
+    /* calculate positions for slider area and lines */
+    var int32 delta = (x2 - x1 ) / 12;
+    var int32 xStart = (( x2 - x1 ) - 12 * delta ) / 2 + delta + x1;
+    var int32 xEnd = xStart + 10 * delta;
+
+
+    ButtonUp.Bounds = rect( 0, 0, x1, y + 1 );
+    ButtonDown.Bounds = rect( 0, y, x1, aSize.y );
+    ButtonOk.Bounds = rect( x2, 0, aSize.x, aSize.y );
+
+    /* calculate slider area */
+    SliderArea.Bounds = rect( x1, 0, x2, aSize.y );
+
+    /* draw separator lines */
+    var int32 y1 = 2;
+    var int32 y2 = aSize.y - 2;
+
+    var int32 x = xStart;
+    Line0.Point1 = point( x, y1 );
+    Line0.Point2 = point( x, y2 );
+    x = x + delta;
+    Line1.Point1 = point( x, y1 );
+    Line1.Point2 = point( x, y2 );
+    x = x + delta;
+    Line2.Point1 = point( x, y1 );
+    Line2.Point2 = point( x, y2 );
+    x = x + delta;
+    Line3.Point1 = point( x, y1 );
+    Line3.Point2 = point( x, y2 );
+    x = x + delta;
+    Line4.Point1 = point( x, y1 );
+    Line4.Point2 = point( x, y2 );
+    x = x + delta;
+    Line5.Point1 = point( x, y1 );
+    Line5.Point2 = point( x, y2 );
+    x = x + delta;
+    Line6.Point1 = point( x, y1 );
+    Line6.Point2 = point( x, y2 );
+    x = x + delta;
+    Line7.Point1 = point( x, y1 );
+    Line7.Point2 = point( x, y2 );
+    x = x + delta;
+    Line8.Point1 = point( x, y1 );
+    Line8.Point2 = point( x, y2 );
+    x = x + delta;
+    Line9.Point1 = point( x, y1 );
+    Line9.Point2 = point( x, y2 );
+    x = x + delta;
+    Line10.Point1 = point( x, y1 );
+    Line10.Point2 = point( x, y2 );
+
+
+    Triangle.Point1 = point( xStart, 5 );
+    Triangle.Point2 = point( xEnd, 5 );
+    Triangle.Point3 = point( xEnd, y );
+    Triangle.Point4 = point( xStart, y );
+
+    Line.Point1 = point( xStart - Thumb.Bitmap.FrameSize.x / 2, y );
+    Line.Point2 = point( xEnd + Thumb.Bitmap.FrameSize.x / 2, y );
+
+
+  }
+
+  $rect <10,160,210,200>
+  inherited method UpdateViewState()
+  {
+    aState;
+
+    var int32 pos = 0;
+
+    /* ensure that the current set value and the given minimum and maximum values are valid */
+    if (( MaxValue > MinValue ) && ( CurrentValue >= MinValue ) && ( CurrentValue <= MaxValue ))
+    {
+      /* calculate the center position of the thumb within the slider area */
+      pos = ( Line.Point2.x - Line.Point1.x - Thumb.Bitmap.FrameSize.x ) * ( CurrentValue - MinValue ) / ( MaxValue - MinValue );
+    }
+
+    /* calculate position of thumb */
+    Thumb.Bounds.origin = point( Line.Point1.x + pos, Line.Point1.y - Thumb.Bounds.h / 2 );
+
+    /* calculate position of touch handler */
+    SimpleTouchHandler.Point1 = point( Thumb.Bounds.x1 - 10, 0 );
+    SimpleTouchHandler.Point2 = point( Thumb.Bounds.x2 + 10, 0 );
+    SimpleTouchHandler.Point3 = point( Thumb.Bounds.x2 + 10, SliderArea.Bounds.y2 );
+    SimpleTouchHandler.Point4 = point( Thumb.Bounds.x1 - 10, SliderArea.Bounds.y2 );
+
+
+
+
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Background
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,0,568,95>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a border view.
+  $rect <20,20,160,60>
+  object Views::Border Border
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,0,568,95>;
+    preset Color = Climate::BorderColor;
+  }
+
+  $rect <20,20,160,60>
+  object Climate::Button ButtonUp
+  {
+    preset Bounds = <0,0,50,40>;
+    preset OnAction = onIncrement;
+    preset Caption = "+";
+  }
+
+  $rect <20,20,160,60>
+  object Climate::Button ButtonDown
+  {
+    preset Bounds = <0,50,50,90>;
+    preset OnAction = onDecrement;
+    preset Caption = "-";
+  }
+
+  $rect <20,20,160,60>
+  object Climate::Button ButtonOk
+  {
+    preset Bounds = <495,10,550,90>;
+    preset OnAction = onOk;
+    preset Caption = "OK";
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle SliderArea
+  {
+    preset Bounds = <60,0,500,100>;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line0
+  {
+    preset Point2 = <70,90>;
+    preset Point1 = <70,0>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line1
+  {
+    preset Point2 = <80,90>;
+    preset Point1 = <80,0>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line2
+  {
+    preset Point2 = <90,90>;
+    preset Point1 = <90,0>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line3
+  {
+    preset Point2 = <100,90>;
+    preset Point1 = <100,0>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line4
+  {
+    preset Point2 = <110,90>;
+    preset Point1 = <110,0>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line5
+  {
+    preset Point2 = <120,90>;
+    preset Point1 = <120,0>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line6
+  {
+    preset Point2 = <130,90>;
+    preset Point1 = <130,0>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line7
+  {
+    preset Point2 = <140,90>;
+    preset Point1 = <140,0>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line8
+  {
+    preset Point2 = <150,90>;
+    preset Point1 = <150,0>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line9
+  {
+    preset Point2 = <160,90>;
+    preset Point1 = <160,0>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line10
+  {
+    preset Point2 = <170,90>;
+    preset Point1 = <170,0>;
+    preset Color = Climate::BackColor;
+  }
+
+  // This is a 2D/3D warp image view.
+  $rect <20,20,160,60>
+  object Views::WarpImage Triangle
+  {
+    preset Point4 = <60,50>;
+    preset Point3 = <510,50>;
+    preset Point2 = <510,10>;
+    preset Point1 = <60,10>;
+    preset Color = Climate::TextColor;
+    preset Opacity = 0xC0;
+    preset Bitmap = Climate::Triangle;
+  }
+
+  // This is a line view.
+  $rect <20,20,160,60>
+  object Views::Line Line
+  {
+    preset Point2 = <510,50>;
+    preset Point1 = <60,50>;
+    preset Color = Climate::TextColor;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image Thumb
+  {
+    preset Bounds = <120,29,160,69>;
+    preset AutoSize = true;
+    preset Bitmap = Climate::Thumb;
+  }
+
+  // The property 'CurrentValue' stores the momentary value of the widget. The value \
+  // is limited automatically to the range from @MinValue to @MaxValue.
+  $rect <210,120,410,160>
+  property int32 CurrentValue = 50;
+
+  $rect <210,160,410,200>
+  onset CurrentValue
+  {
+    /* limit the given value to the range between MinValue and MaxValue */
+    if ( value < MinValue )
+      value = MinValue;
+    if ( value > MaxValue )
+      value = MaxValue;
+
+    /* check if the given value differs from the current value */
+    if ( pure CurrentValue == value )
+      return;
+
+    /* store the new value */
+    pure CurrentValue = value;
+
+    /* ...and finally, force an update */
+    InvalidateViewState();
+  }
+
+  // The property 'MinValue' defines the lower boundary of the widgets value range.
+  $rect <420,120,620,160>
+  property int32 MinValue = 0;
+
+  $rect <420,160,620,200>
+  onset MinValue
+  {
+    /* check if the given value differs from the current value */
+    if ( pure MinValue == value )
+      return;
+
+    /* store the new value */
+    pure MinValue = value;
+
+    /* ...and finally, force an update */
+    InvalidateViewState();
+  }
+
+  // The property 'MaxValue' defines the upper boundary of the widgets value range.
+  $rect <630,120,830,160>
+  property int32 MaxValue = 100;
+
+  $rect <630,160,830,200>
+  onset MaxValue
+  {
+    /* check if the given value differs from the current value */
+    if ( pure MaxValue == value )
+      return;
+
+    /* store the new value */
+    pure MaxValue = value;
+
+    /* ...and finally, force an update */
+    InvalidateViewState();
+  }
+
+  // This is a generic touch handler.
+  $rect <20,20,160,60>
+  object Core::SimpleTouchHandler SimpleTouchHandler
+  {
+    preset Point4 = <110,95>;
+    preset Point3 = <170,95>;
+    preset Point2 = <170,0>;
+    preset Point1 = <110,0>;
+    preset OnDrag = onDragSlot;
+    preset OnRelease = onReleaseSlot;
+    preset OnPress = onPressSlot;
+  }
+
+  // This internal slot method is used to receive the corresponding signals form \
+  // the touch handler.
+  $rect <210,340,410,380>
+  slot onPressSlot
+  {
+    /* The user interaction begins. Force the widget to highlight itself. */
+    InvalidateViewState();
+    startValue = CurrentValue;
+  }
+
+  // This internal slot method is used to receive the corresponding signals form \
+  // the touch handler.
+  $rect <210,380,410,420>
+  slot onDragSlot
+  {
+    var int32 oldValue = CurrentValue;
+    var int32 ofs = SimpleTouchHandler.CurrentPos.x - SimpleTouchHandler.HittingPos.x;
+
+    /* ensure that the current set value and the given minimum and maximum values are valid */
+    if (( MaxValue > MinValue ) && ( CurrentValue >= MinValue ) && ( CurrentValue <= MaxValue ))
+    {
+      /* calculate the center position of the thumb within the slider area */
+      ofs = ofs * ( MaxValue - MinValue ) /  ( Line.Point2.x - Line.Point1.x - Thumb.Bitmap.FrameSize.x );
+    }
+    else
+      ofs = 0;
+
+    /* change the value */
+    CurrentValue = startValue + ofs;
+
+    /* inform others about the changed value */
+    if ( CurrentValue != oldValue )
+    {
+      /* update the attached outlet, if there is one... */
+      if (  Outlet != null )
+        Outlet^ = CurrentValue;
+    }
+
+  }
+
+  // This slot method will receive a signal, if the value of the property assigned \
+  // to @Outlet has been changed by another widget or by the application logic. In \
+  // response to this notification, the widget will update itself.
+  $rect <210,300,410,340>
+  slot outletSlot
+  {
+    /* update the current state of the widget */
+    if ( Outlet != null )
+      CurrentValue = Outlet^;
+  }
+
+  $rect <210,250,410,290>
+  onset Outlet
+  {
+    /* check if the new outlet differs from the currently used outlet */
+    if ( pure Outlet == value )
+      return;
+
+    /* detach from the previous outlet */
+    detachobserver outletSlot, pure Outlet;
+
+    /* store the new outlet */
+    pure Outlet = value;
+
+    /* ... and attach to the new one */
+    attachobserver outletSlot, value;
+
+    /* finally, update the current state of the widget by posting a signal to the outlet slot */
+    if ( value != null )
+      postsignal outletSlot;
+  }
+
+  // The property Outlet provides an interface for the Controller-View model. In \
+  // the Controller-View model, the widgets (views) and the application logic (controllers) \
+  // are always kept apart. An automatism behind this model ensures, that widgets \
+  // are notified automatically as soon as the affected controller has changed its \
+  // state. On the other hand, user interactions on a widget cause the affected controller \
+  // to execute the application logic. Usually, a controller is a simple Chora object \
+  // containg several properties and the implementation of onget/onset method.
+  // By assigning a property reference, Outlet establishes a connection between the \
+  // widget and the controller object, the affected property belongs to. After this, \
+  // the widget is able to read and modify the referred property in response to the \
+  // user interactions. It is also able to adapt the widget appearance, if the value \
+  // of the referred property has been modified by another widget or by the application \
+  // logic itself.
+  $rect <210,210,410,250>
+  property ^int32 Outlet = null;
+
+  // The property 'OnChange' can refer to a slot method, which will receive a signal \
+  // each time the user has changed the value of the slider. Thereupon the method's \
+  // logic will be executed.
+  $rect <630,300,830,340>
+  property slot OnClose = null;
+
+  // This internal slot method is used to receive the corresponding signals form \
+  // the touch handler.
+  $rect <210,420,410,460>
+  slot onReleaseSlot
+  {
+    /* The user interaction terminates. Force the widget to de-highlight itself. */
+    InvalidateViewState();
+
+
+  }
+
+  // This variable stores the Value at the beginning of the user interaction.
+  $rect <420,420,620,460>
+  var int32 startValue = 0;
+
+  // Slot method for the PlusButton.
+  $rect <420,210,620,250>
+  slot onIncrement
+  {
+    sender; /* the method is called from the sender object */
+
+    CurrentValue = ( CurrentValue / 10 ) * 10 + 10;
+
+      /* update the attached outlet, if there is one... */
+      if (  Outlet != null )
+        Outlet^ = CurrentValue;
+
+  }
+
+  // Slot method for the MinusButton.
+  $rect <420,250,620,290>
+  slot onDecrement
+  {
+    sender; /* the method is called from the sender object */
+
+    CurrentValue = (( CurrentValue + 9 ) / 10 ) * 10 - 10;
+
+      /* update the attached outlet, if there is one... */
+      if (  Outlet != null )
+        Outlet^ = CurrentValue;
+
+  }
+
+  // Slot method for the OkButton.
+  $rect <420,300,620,340>
+  slot onOk
+  {
+    sender; /* the method is called from the sender object */
+
+    postsignal OnClose;
+  }
+
+  // The class 'SliderItem' implements a horizontal slider widget, that is used to \
+  // change a value by moving a thumb. Additionally, the value can be changed by \
+  // pressing the '+' or  '-' buttons.
+  // 
+  // The property 'CurrentValue' represents the momentary value of the widget and \
+  // corresponds to the position of the thumb. The supported value range of the slider \
+  // can be defined by setting the properties 'MinValue' and 'MaxValue'.
+  // A slider can be connected with an Int32 'Outlet' property to show the current \
+  // value of the property and to change it by moving the thumb. 
+  // 
+  // The widget will trigger the slot method 'OnClose' as soon as the user has pressed \
+  // the 'OK' button.
+  note legend Note
+  {
+    attr Bounds = <10,470,830,650>;
+  }
+}
+
+// Button widget used within the slider item.
+$rect <240,260,440,300>
+$output false
+class Button : Core::Group
+{
+  $rect <10,120,210,160>
+  inherited property Bounds = <0,0,50,40>;
+
+  $rect <10,80,210,120>
+  inherited method UpdateViewState()
+  {
+    aState;
+
+    /* colorize background if currently selected */
+    if ( TouchHandler.Down && TouchHandler.Inside )
+      Background.Color = Climate::BorderColor;
+    else 
+      Background.Color = Climate::BackColor;
+
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Background
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,0,50,40>;
+    preset Color = Climate::SelectColor;
+  }
+
+  // This is a border view.
+  $rect <20,20,160,60>
+  object Views::Border Border
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,0,50,40>;
+    preset Color = Climate::BorderColor;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Text
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Bounds = <0,0,50,40>;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "+";
+    preset Font = Climate::MediumFont;
+    preset Color = Climate::TextColor;
+  }
+
+  $rect <20,20,160,60>
+  object Core::SimpleTouchHandler TouchHandler
+  {
+    preset Layout = Core::Layout[AlignToBottom, AlignToLeft, AlignToRight, AlignToTop, ResizeHorz, ResizeVert];
+    preset Point4 = <0,40>;
+    preset Point3 = <50,40>;
+    preset Point2 = <50,0>;
+    preset Point1 = <0,0>;
+    preset OnLeave = enterLeaveSlot;
+    preset OnEnter = enterLeaveSlot;
+    preset OnRelease = pressReleaseSlot;
+    preset OnPress = pressReleaseSlot;
+  }
+
+  // This internal slot method is used to receive the corresponding signals form \
+  // the touch handler.
+  $rect <210,80,410,120>
+  slot enterLeaveSlot
+  {
+    InvalidateViewState();
+  }
+
+  // This internal slot method is used to receive the corresponding signals form \
+  // the touch handler.
+  $rect <210,120,410,160>
+  slot pressReleaseSlot
+  {
+    /* releasing the finger outside the button area is ignored */
+    if ( !TouchHandler.Down && TouchHandler.Inside )
+    {
+      /* inform the OnChange slot method */
+      signal OnAction;
+    }
+  }
+
+  // The property 'OnAction' can refer to a slot method, which will receive a signal \
+  // as soon the user has pressed the button. Thereupon the method's logic will be \
+  // executed.
+  $rect <410,120,610,160>
+  property slot OnAction = null;
+
+  // This property 'Caption' contains the title of the button.
+  $rect <210,0,410,40>
+  property string Caption = "";
+
+  $rect <210,40,410,80>
+  onset Caption
+  {
+    /* store the given value */
+    pure Caption = value;
+
+    /* forward the new caption */
+    Text.String = value;
+  }
+
+  // The class 'Button' implements a simple push button to trigger a certain action.
+  // The button contains a text item that can be set with the property 'Caption'.
+  // Each time the user has pressed the button a signal is sent to the slot method \
+  // 'OnAction'.
+  note legend Note
+  {
+    attr Bounds = <10,180,610,260>;
+  }
+}
+
+// Climate cabinet main screen, 
+// widgets and diagram classes
+note group Note
+{
+  attr Bounds = <20,10,460,320>;
+}
+
+// Device class
+note group Note3
+{
+  attr Bounds = <20,330,460,430>;
+}

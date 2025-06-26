@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   viewBox="0 0 333.8 265.95"
+   version="1.1"
+   id="svg32"
+   sodipodi:docname="Element 10.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+  <metadata
+     id="metadata36">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1600"
+     inkscape:window-height="1137"
+     id="namedview34"
+     showgrid="false"
+     inkscape:zoom="2.5099033"
+     inkscape:cx="161.4571"
+     inkscape:cy="117.756"
+     inkscape:window-x="1912"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg32" />
+  <defs
+     id="defs4">
+    <style
+       id="style2">
+      .cls-1, .cls-2, .cls-5 {
+        fill: none;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-1, .cls-2 {
+        stroke: #4db598;
+      }
+
+      .cls-2 {
+        stroke-width: 1.5px;
+      }
+
+      .cls-3 {
+        font-size: 7px;
+        font-family: Exo2-Bold, &quot;Exo 2&quot;;
+        font-weight: 700;
+      }
+
+      .cls-3, .cls-6 {
+        fill: #fff;
+      }
+
+      .cls-4 {
+        letter-spacing: -0.01em;
+      }
+
+      .cls-5 {
+        stroke: #fff;
+      }
+    </style>
+  </defs>
+  <g
+     id="Ebene_2"
+     data-name="Ebene 2">
+    <g
+       id="Ebene_1-2"
+       data-name="Ebene 1">
+      <g
+         id="g28">
+        <g
+           id="g26">
+          <g
+             aria-label="KW"
+             transform="translate(231.31 228.38)"
+             style="font-weight:700;font-size:7px;font-family:Exo2-Bold, 'Exo 2';fill:#ffffff"
+             id="text14" />
+          <g
+             id="g24">
+            <g
+               id="g22">
+              <path
+                 id="rect20"
+                 style="fill:#ffffff;stroke:#4db598;stroke-opacity:1"
+                 d="m 251.65001,224.92999 c 0,4.07863 -1.65319,7.77113 -4.32604,10.44397 -2.67284,2.67285 -6.36535,4.32603 -10.44397,4.32603 -4.07862,0 -7.77112,-1.65319 -10.44397,-4.32603 -2.67284,-2.67285 -4.32603,-6.36534 -4.32603,-10.44397 0,-4.07863 1.65319,-7.77113 4.32603,-10.44397 2.67284,-2.67284 6.36534,-4.32603 10.44397,-4.32603 4.07863,0 7.77113,1.65319 10.44397,4.32603 2.67285,2.67284 4.32604,6.36534 4.32604,10.44397 z M 215.35,82.68 h 11.66 11.66 l 3.825,10.7325 3.825,10.7325 3.825,10.7325 3.825,10.7325 5.61625,15.88875 5.61625,15.88875 5.61625,15.88875 5.61625,15.88875 5.61625,15.88875 5.61625,15.88875 5.61625,15.88875 L 298.9,252.72 h 14.29 14.29 l 5.86,13.02 M 137.67,0.5 h 12.07 12.07 12.07 12.07 l 5.5425,15.804375 5.5425,15.804375 5.5425,15.804375 5.5425,15.804375 5.5425,15.804375 5.5425,15.804375 5.5425,15.80438 5.5425,15.80437 5.5425,15.80437 5.5425,15.80438 5.5425,15.80437 5.5425,15.80438 5.5425,15.80437 5.5425,15.80438 5.5425,15.80437 5.5425,15.80438 h -9.445 -9.445 -9.445 -9.445 V 239.7"
+                 inkscape:connector-curvature="0"
+                 sodipodi:nodetypes="ssssssssscccccccccccccccccccccccccccccccccccccccccccc" />
+            </g>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

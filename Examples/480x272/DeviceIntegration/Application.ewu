@@ -1,0 +1,637 @@
+﻿$version 14.00
+
+// This is an inline code block.
+$rect <30,80,230,120>
+inline Inline
+{
+  /* include the device driver header file to get access for the device class */
+  #include "DeviceDriver.h"
+
+}
+
+// This is the root component of the entire GUI application.
+$rect <30,30,230,70>
+$output false
+class Application : Core::Root
+{
+  $rect <510,10,710,50>
+  inherited property Bounds = <0,0,480,272>;
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle
+  {
+    preset Bounds = <0,0,480,272>;
+    preset Color = #F7F4E7FF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Text3
+  {
+    preset Bounds = <10,240,470,275>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "www.embedded-wizard.de";
+    preset Font = Resources::FontSmall;
+    preset Color = #5E5E5EFF;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::ToggleButton CheckBox
+  {
+    preset Bounds = <30,130,230,180>;
+    preset Outlet = ^Application::Device.LedStatus;
+    preset Label = "LED State";
+    preset Appearance = WidgetSet::CheckBox_Lime_Medium;
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::PushButton ActionButton
+  {
+    preset Bounds = <30,60,250,110>;
+    preset OnActivate = SlotHelloWorld;
+    preset Label = "Print \"Hello World\"";
+    preset Appearance = WidgetSet::PushButton_Lime_Medium;
+  }
+
+  // This is a slot method.
+  $rect <510,60,710,100>
+  slot SlotHelloWorld
+  {
+    Application::Device.CommandPrint( "Hello World" );
+  }
+
+  $rect <20,20,160,60>
+  object Views::Image Indicator
+  {
+    preset Bounds = <400,20,450,70>;
+    preset Color = #000000FF;
+    preset Bitmap = Application::Bolt;
+    preset Visible = false;
+  }
+
+  $rect <20,20,160,60>
+  object Views::Text CaptionText
+  {
+    preset Bounds = <20,10,260,40>;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "Device Integration";
+    preset Font = Resources::FontMedium;
+    preset Color = #000000FF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Text4
+  {
+    preset Bounds = <270,170,450,205>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzRight, AlignVertCenter];
+    preset String = "ADC Value";
+    preset Font = Resources::FontSmall;
+    preset Color = #5E5E5EFF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Text5
+  {
+    preset Bounds = <290,80,450,110>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzRight, AlignVertCenter];
+    preset String = "Hard Button Event";
+    preset Font = Resources::FontSmall;
+    preset Color = #5E5E5EFF;
+  }
+
+  // This is a key press handler.
+  $rect <0,740,200,780>
+  object Core::KeyPressHandler KeyHandler
+  {
+    preset OnPress = TestSlot;
+    preset Filter = Core::KeyCode.Space;
+    preset OnHold = TestSlot;
+  }
+
+  // This is a slot method.
+  $rect <200,740,400,780>
+  slot TestSlot
+  {
+    sender; /* the method is called from the sender object */
+
+    /* the following code is only for prototyping, in order to simulate a hardware button event when you press the 'Return' key on the keyboard */
+    $if $prototyper
+
+    /* trigger a HardButtonEvent to test the application */
+    Application::Device.TriggerHardButtonEvent();
+
+    /* generate a random ADC value */
+    Application::Device.UpdateAdcValue( math_rand( 0, 1023 ));
+
+    $endif
+  }
+
+  $rect <20,20,160,60>
+  object WidgetSet::HorizontalValueBar HorzBar
+  {
+    preset Bounds = <30,210,450,240>;
+    preset Outlet = ^Application::Device.AdcValue;
+    preset MaxValue = 1023;
+    preset CurrentValue = 0;
+    preset Appearance = WidgetSet::HorizontalValueBar_Lime_Medium;
+  }
+
+  // Important: For more details about device classes and device drivers, please \
+  // have a look to 
+  // https://doc.embedded-wizard.de/device-class-and-device-driver
+  note legend Note12
+  {
+    attr Bounds = <0,660,760,730>;
+  }
+
+  // Variable to reference the device class the entire lifetime of the application. \
+  // This avoids that the device class will be deleted by the Garbage Collector.
+  $rect <710,10,910,50>
+  var Application::DeviceClass Device = Application::Device;
+
+  $rect <20,20,160,60>
+  object Views::Text Counter
+  {
+    preset Bounds = <340,120,450,165>;
+    preset Alignment = Views::TextAlignment[AlignHorzRight, AlignVertCenter];
+    preset String = "0000";
+    preset Font = Resources::FontExtraLarge;
+    preset Color = #000000FF;
+  }
+
+  // This object is a system event handler.
+  $rect <530,150,830,190>
+  object Core::SystemEventHandler HardButtonEventHandler
+  {
+    preset OnEvent = onHardButtonEvent;
+    preset Event = Application::Device.HardButtonEvent;
+  }
+
+  // This slot method is executed when the associated system event handler receives \
+  // an event.
+  $rect <830,150,1030,190>
+  slot onHardButtonEvent
+  {
+    /* start the bool effect to show the symbol for a short time */
+    postsignal BoolEffect.StartEffect;
+
+  }
+
+  // This is a bool change effect.
+  $rect <830,190,1030,230>
+  object Effects::BoolEffect BoolEffect
+  {
+    preset Value2 = false;
+    preset Value1 = true;
+    preset Outlet = ^Indicator.Visible;
+    preset NoOfCycles = 1;
+    preset CycleDuration = 100;
+  }
+
+  $rect <530,300,830,340>
+  object Core::PropertyObserver AdcValueObserver
+  {
+    preset OnEvent = onAdcValueEvent;
+    preset Outlet = ^Application::Device.AdcValue;
+  }
+
+  // This slot method is executed when the associated property observer is notified.
+  $rect <830,300,1030,340>
+  slot onAdcValueEvent
+  {
+    Counter.String = string( Device.AdcValue, 4 );
+  }
+
+  // Property Observer
+  note group Note1
+  {
+    attr Bounds = <510,260,1050,360>;
+  }
+
+  // System Event Handler
+  note group Note2
+  {
+    attr Bounds = <510,110,1050,250>;
+  }
+
+  // The application contains the following UI components:
+  // 
+  // The pushbutton calls the method 'SlotHelloWorld', which calls a command of the \
+  // device class in order to send the string "Hello World" via serial interface.
+  // 
+  // The checkbox 'LED State' is connected (via Outlet) to the property 'LedStatus' \
+  // of the device class. Each time the user changes the checked state of the widget, \
+  // the property 'LedStatus' within the device class is changed. As a result, the \
+  // corresponding function within the device driver is called and the LED on the \
+  // board is set accordingly.
+  // 
+  // When you press the hardware button on the development board, the system event \
+  // 'HardButtonEvent' is triggert. This event is received by the 'HardButtonEventHandler', \
+  // which calls the 'onHardButtonEvent' method. As a result, the 'Indicator' image \
+  // is shown for a short time.
+  // 
+  // As soon as the device driver gets a new (simulated) ADC value, the property \
+  // 'AdcValue' of the device class is incremented. The value bar is notified automatically \
+  // (via Outlet) and will update the content.
+  // Additionally, a property observer is connected with the property 'AdcValue'. \
+  // Each time the value changes, the slot method 'onAdcValueEvent' is called. This \
+  // is used to prepare the string of the 'ADC Value' text view.
+  note legend Note
+  {
+    attr Bounds = <0,370,1060,650>;
+  }
+
+  // This is a key press handler.
+  $rect <0,790,200,830>
+  object Core::KeyPressHandler KeyUpHandler
+  {
+    preset OnPress = UpSlot;
+    preset Filter = Core::KeyCode.Up;
+  }
+
+  $rect <200,790,400,830>
+  slot UpSlot
+  {
+    sender; /* the method is called from the sender object */
+
+    /* set the focus to the upper control item */
+    Focus = ActionButton;
+
+  }
+
+  // This is a key press handler.
+  $rect <0,840,200,880>
+  object Core::KeyPressHandler KeyDownHandler
+  {
+    preset OnPress = DownSlot;
+    preset Filter = Core::KeyCode.Down;
+  }
+
+  $rect <200,840,400,880>
+  slot DownSlot
+  {
+    sender; /* the method is called from the sender object */
+
+    /* set the focus to the lower control item */
+    Focus = CheckBox;
+
+  }
+}
+
+// The class 'Application' implements the appearance and the behavior of the entire \
+// UI application. All UI compontens within the application class are connected with \
+// the device class to get data or to start a certain action.
+note legend Note1
+{
+  attr Bounds = <460,30,960,140>;
+}
+
+// This class implements the interface between the GUI application and the device.
+$rect <30,160,230,200>
+$output false
+class DeviceClass
+{
+  // This property represents a data value that is updated by the device driver (ADC \
+  // value).
+  $rect <230,420,430,460>
+  property int32 AdcValue = 0;
+
+  // This method is intended to be called by the device driver to notify the GUI \
+  // application about an alternation of its setting or state value.
+  $rect <30,420,230,460>
+  $output true
+  method void UpdateAdcValue( arg int32 aNewValue )
+  {
+    /* limit the provided value (let's assume a 10 bit ADC...) */
+    if ( aNewValue < 0 ) aNewValue = 0;
+    if ( aNewValue > 1023 ) aNewValue = 1023;
+
+
+    /* only if the reported value differs from the currently stored currently value */
+    if ( aNewValue != pure AdcValue )
+    {
+      /* remember the new value in the internal memory of the property */
+      pure AdcValue = aNewValue;
+
+      /* notify all associated property observers */
+      notifyobservers ^AdcValue;
+    }
+  }
+
+  // This object represents an individual system event.
+  $rect <230,540,430,580>
+  object Core::SystemEvent HardButtonEvent;
+
+  // This method is intended to be called by the device to notify the GUI application \
+  // about a particular system event.
+  $rect <30,540,230,580>
+  $output true
+  method void TriggerHardButtonEvent()
+  {
+    /* trigger the system event - all associated system event handler
+       will then be notified automatically */
+    HardButtonEvent.Trigger( null, false );
+
+    /*
+       HINT 1:
+
+       When triggering the event you can pass an optional 'context' object.
+       With it additional event specific data can be attached at the event
+       and dispatched with it. All notified system event handler can thus
+       evaluate this 'context' information.
+
+       To do this, you will need to define a particular 'context' class
+       suitable to store the event specific information. Then create an
+       instance of the class, initialize it with all the specific context
+       data and finally pass the instance in the first parameter of the
+       Trigger() method:
+
+
+       var YourUnit::ContextClass context = new YourUnit::ContextClass;
+
+       context.SomeData1 = ...
+       context.SomeData2 = ...
+
+       SystemEvent.Trigger( context, false );
+
+
+       You can add parameters to the method in order to simply receive
+       values from the device.
+    */
+
+    /*
+       HINT 2:
+
+       When triggering a system event you can determine its priority. Per
+       default systeme events are delivered strictly in the order in which
+       they have been triggered. When you pass 'true' in the last parameter
+       of Trigger() you can force the event to be dispatched early:
+
+       SystemEvent.Trigger( null, true );
+    */
+  }
+
+  // This method implements a device command that calls the underlying device driver \
+  // to print the given string (e.g. via serial interface).
+  $rect <30,180,230,220>
+  method void CommandPrint( arg string aMessage )
+  {
+    $if $prototyper
+
+      /* in case of prototpyer, the message is sent to log window */
+      trace aMessage;
+
+    $endif
+
+    $if !$prototyper
+
+      /* in case of target, the device driver function for printing a message is called */
+      native ( aMessage )
+      {
+        DeviceIntegrationExample_PrintMessage( aMessage );
+      }
+
+    $endif
+
+  }
+
+  // Example of an interface to read a device setting
+  note group Note1
+  {
+    attr Bounds = <10,370,470,480>;
+  }
+
+  // Example of an interface to react to a system event
+  note group Note2
+  {
+    attr Bounds = <10,490,470,600>;
+  }
+
+  // Example of a command to start an action on the device
+  note group Note3
+  {
+    attr Bounds = <10,130,470,240>;
+  }
+
+  // The property 'AdcValue' represents a data value that is provided by the device \
+  // driver. In this example it is a simulated ADC value.
+  // The method 'UpdateAdcValue', is called by the device driver to notify the GUI \
+  // application periodically about an alternation of the data value. As a result, \
+  // all observers of this property get notified.
+  note legend Note4
+  {
+    attr Bounds = <540,370,1200,480>;
+  }
+
+  note arrow Note5
+  {
+    attr Point1 = <470,410>;
+    attr Point2 = <540,410>;
+  }
+
+  // The object 'HardButtonEvent' represents an individual system event. The method \
+  // 'TriggerHardButtonEvent' is called by the device driver, when the hardware button \
+  // of the board is pressed. As soon as the system event is triggered all associated \
+  // system event handler are notified automatically.
+  note legend Note6
+  {
+    attr Bounds = <540,490,1200,600>;
+  }
+
+  note arrow Note7
+  {
+    attr Point1 = <470,540>;
+    attr Point2 = <540,540>;
+  }
+
+  // This method demonstrates the implementation of a device command. The GUI application \
+  // calls this method to transfer a string to the device driver, which prints the \
+  // string via a serial interface.
+  note legend Note8
+  {
+    attr Bounds = <540,130,1200,240>;
+  }
+
+  note arrow Note9
+  {
+    attr Point1 = <470,180>;
+    attr Point2 = <540,180>;
+  }
+
+  // This property represents the state of the LED mounted on the board.
+  $rect <30,300,230,340>
+  property bool LedStatus = false;
+
+  $rect <230,300,430,340>
+  onset LedStatus
+  {
+    /* the property doesn't change -> nothing to do */
+    if ( pure LedStatus == value )
+      return;
+
+    /* remember the new value in the internal memory of the property */
+    pure LedStatus = value;
+
+    $if !$prototyper
+
+      /* on the real target, the LED will switched on/off */
+      native ( value )
+      {
+        DeviceIntegrationExample_SetLedStatus( value );
+      }
+    $endif
+
+    /* notify all associated property observers */
+    notifyobservers ^LedStatus;
+  }
+
+  // The property 'LedStatus' represents the state of the board LED. Through the \
+  // associated 'onset' method all write operations to the property are directed \
+  // to device driver, which finally switches the LED on or off. The read accesses, \
+  // in contrast, are handled internally by using the last known value of the property.
+  note legend Note
+  {
+    attr Bounds = <540,250,1200,360>;
+  }
+
+  // Example of an interface to modify a device setting
+  note group Note10
+  {
+    attr Bounds = <10,250,470,360>;
+  }
+
+  note arrow Note11
+  {
+    attr Point1 = <470,300>;
+    attr Point2 = <540,300>;
+  }
+
+  // Important: For more details about device classes and device drivers, please \
+  // have a look to https://doc.embedded-wizard.de/device-class-and-device-driver
+  note legend Note12
+  {
+    attr Bounds = <10,610,1200,680>;
+  }
+
+  $rect <230,60,430,100>
+  inherited method Done()
+  {
+    $if !$prototyper
+
+      /* on the real target the de-initialization function of the device driver is called 
+         in order to de-initialize the hardware or to quit a worker-thread */
+      native
+      {
+        DeviceIntegrationExample_Done();
+      }
+
+    $endif
+
+  }
+
+  $rect <30,60,230,100>
+  inherited method Init()
+  {
+    aArg; /* not used */
+
+    $if !$prototyper
+
+      /* on the real target the initialization function of the device driver is called
+         in order to initialize the hardware or to start a worker-thread */
+      native
+      {
+        DeviceIntegrationExample_Init();
+      }
+
+    $endif
+
+  }
+
+  // The method 'Init' is executed just in the moment when a new instance of 'Application::DeviceClass' \
+  // is created. It is used to initialize the hardware represented by the interface. \
+  // In this example the methods are used to get access to the hardware components \
+  // (e.g. LED, hardbutton, ADC value).
+  // The counterpart 'Done' is executed when an instance of 'Application::DeviceClass' \
+  // is disposed.
+  note legend Note13
+  {
+    attr Bounds = <540,10,1200,120>;
+  }
+
+  note arrow Note14
+  {
+    attr Point1 = <470,60>;
+    attr Point2 = <540,60>;
+  }
+
+  // Constructor and Destructor
+  note group Note15
+  {
+    attr Bounds = <10,10,470,120>;
+  }
+
+  // Directives to adapt the order of the above members according to how these members 
+  // where arranged when the project content was stored. In this manner the storage 
+  // and the expected order of the members don't depend. Merging of changes in the 
+  // project files is simplified.
+  $member Done
+  $member Init
+  $member AdcValue
+  $member UpdateAdcValue
+  $member HardButtonEvent
+  $member TriggerHardButtonEvent
+  $member CommandPrint
+  $member Note1
+  $member Note2
+  $member Note3
+  $member Note4
+  $member Note5
+  $member Note6
+  $member Note7
+  $member Note8
+  $member Note9
+  $member LedStatus
+  $member OnSetLedStatus
+  $member Note
+  $member Note10
+  $member Note11
+  $member Note12
+  $member Note13
+  $member Note14
+  $member Note15
+}
+
+// This object represents an instance of the device interface implemented in the \
+// class Application::DeviceClass.
+$rect <230,160,430,200>
+autoobject Application::DeviceClass Device;
+
+// The class 'Application::DeviceClass' implements the interface between the GUI \
+// application and the device. The class reacts on system events sent by the device \
+// driver, it exchanges data with the device driver or it send commands to the device \
+// driver.
+// The object 'Device' represents the instance of the device interface. As an autoobject \
+// it is globaly available for all GUI components within your project and can be \
+// easily accessed.
+note legend Note
+{
+  attr Bounds = <460,150,960,330>;
+}
+
+$rect <30,230,230,270>
+$output false
+resource Resources::Bitmap Bolt
+{
+  attr bitmapfile FileName = .\Res\Bolt.png;
+  attr bitmapdithering Dithering = Auto;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Alpha8;
+  attr bitmapmode Mode = Default;
+}

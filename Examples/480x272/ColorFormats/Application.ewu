@@ -1,0 +1,322 @@
+﻿$version 14.00
+
+// This is the root component of the entire GUI application.
+$rect <20,20,220,60>
+$output false
+class Application : Core::Root
+{
+  $rect <510,10,710,50>
+  inherited property Bounds = <0,0,480,272>;
+
+  // This is the Application class of the example.
+  // 
+  // It contains some text views with color gradients, several filled rectangles \
+  // with color gradients and an image object. The content of the image object is \
+  // changed every second. For this purpose, a timer object and a slot method is \
+  // used.
+  // 
+  // You can change the currently used profile and color format within the profile \
+  // selection drop-down list and you will see immediately how the UI appears by \
+  // using a certain color format.
+  // To run the application within the Prototyper, press 'F5'. Also in the Prototyper \
+  // you will see the currently used color format.
+  note legend Note1
+  {
+    attr Bounds = <0,300,730,540>;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle
+  {
+    preset Bounds = <0,0,480,272>;
+    preset Color = #242323FF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Text3
+  {
+    preset Bounds = <10,240,470,275>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "www.embedded-wizard.de";
+    preset Font = Application::FontSmall;
+    preset Color = #FFFFFFFF;
+  }
+
+  // This is a slot method to change the content of the image view.
+  $rect <510,100,710,140>
+  slot OnChangeImage
+  {
+    sender; /* the method is called from the sender object */
+
+    /* determine the next image number */
+    imageNo = imageNo + 1;
+    if ( imageNo > 6 )
+      imageNo = 0;
+
+    /* assign the desired bitmap resource to the image view */
+    switch ( imageNo )
+    {
+      case 0: Image.Bitmap = Application::Image1;
+      case 1: Image.Bitmap = Application::Image2;
+      case 2: Image.Bitmap = Application::Image3;
+      case 3: Image.Bitmap = Application::Image4;
+      case 4: Image.Bitmap = Application::Image5;
+      case 5: Image.Bitmap = Application::Image6;
+      case 6: Image.Bitmap = Application::Image7;
+
+      default:
+        Image.Bitmap = Application::Image1;
+    }
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Caption
+  {
+    preset Bounds = <20,10,470,60>;
+    preset ColorBL = #00FF14FF;
+    preset ColorBR = #FF0034FF;
+    preset ColorTR = #FF0034FF;
+    preset ColorTL = #00FF14FF;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "Text with color gradient";
+    preset Font = Application::FontLarge;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Text1
+  {
+    preset Bounds = <20,60,460,110>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "Every UI application can be generated for different color formats!";
+    preset Font = Application::FontSmall;
+    preset Color = #EEFF0BFF;
+  }
+
+  // This is a border view.
+  $rect <20,20,160,60>
+  object Views::Border Border
+  {
+    preset Bounds = <290,110,460,240>;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image Image
+  {
+    preset Bounds = <295,115,455,235>;
+    preset Bitmap = Application::Image1;
+  }
+
+  // Variable to store the current image number.
+  $rect <510,140,710,180>
+  var int32 imageNo = 0;
+
+  // This is a timer object to trigger the slide show.
+  $rect <510,60,710,100>
+  object Core::Timer ChangeImageTimer
+  {
+    preset OnTrigger = OnChangeImage;
+    preset Enabled = true;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Caption0
+  {
+    preset Bounds = <20,120,260,170>;
+    preset ColorBL = #102DFFFF;
+    preset ColorBR = #FFC500FF;
+    preset ColorTR = #FFC500FF;
+    preset ColorTL = #102DFFFF;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = $ColorFormatName;
+    preset Font = Application::FontLarge;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle0
+  {
+    preset Bounds = <20,180,260,190>;
+    preset ColorBL = #000000FF;
+    preset ColorTL = #000000FF;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle1
+  {
+    preset Bounds = <20,195,260,205>;
+    preset ColorBL = #000000FF;
+    preset ColorBR = #FF0000FF;
+    preset ColorTR = #FF0000FF;
+    preset ColorTL = #000000FF;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle2
+  {
+    preset Bounds = <20,210,260,220>;
+    preset ColorBL = #000000FF;
+    preset ColorBR = #00FF00FF;
+    preset ColorTR = #00FF00FF;
+    preset ColorTL = #000000FF;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle3
+  {
+    preset Bounds = <20,225,260,235>;
+    preset ColorBL = #000000FF;
+    preset ColorBR = #0000FFFF;
+    preset ColorTR = #0000FFFF;
+    preset ColorTL = #000000FF;
+  }
+}
+
+// Font resource for large font - used for the caption text items.
+$rect <20,100,220,140>
+$output false
+resource Resources::Font FontLarge
+{
+  attr fontname FontName = Arial;
+  attr fontheight Height = 48;
+  attr fontquality Quality = High;
+  attr fontranges Ranges = 0x20-0x7F;
+  attr fontaspectratio AspectRatio = 1.0;
+  attr fontbold Bold = false;
+  attr fontitalic Italic = false;
+  attr fontkerning Kerning = true;
+  attr fontheightmode HeightMode = Compatible;
+  attr fontrowdistance RowDistance;
+}
+
+// Bitmap resource for small photo images.
+$rect <230,20,430,60>
+$output false
+resource Resources::Bitmap Image1
+{
+  attr bitmapfile FileName = .\Res\Img_01.jpg;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Font resource for small font - used for the description text items.
+$rect <20,140,220,180>
+$output false
+resource Resources::Font FontSmall
+{
+  attr fontname FontName = Arial;
+  attr fontheight Height = 24;
+  attr fontquality Quality = High;
+  attr fontranges Ranges = 0x20-0xFF;
+  attr fontaspectratio AspectRatio = 1.0;
+  attr fontbold Bold = false;
+  attr fontitalic Italic = false;
+  attr fontkerning Kerning = true;
+  attr fontheightmode HeightMode = Compatible;
+  attr fontrowdistance RowDistance;
+}
+
+// This is the unit 'Application' of the ColorFormats example.
+// 
+// The unit contains the class 'Application' that implements the appearance and the \
+// behavior of the entire UI application.
+// 
+// Additionally, the unit contains the necessary resources for the sample: Two different \
+// font resources and a couple of bitmap resources.
+// 
+// You can double-click on the 'Application' brick to open the class within the Composer.
+note legend Note1
+{
+  attr Bounds = <10,190,640,390>;
+}
+
+// Bitmap resource for small photo images.
+$rect <230,60,430,100>
+$output false
+resource Resources::Bitmap Image2
+{
+  attr bitmapfile FileName = .\Res\Img_02.jpg;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Bitmap resource for small photo images.
+$rect <230,100,430,140>
+$output false
+resource Resources::Bitmap Image3
+{
+  attr bitmapfile FileName = .\Res\Img_03.jpg;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Bitmap resource for small photo images.
+$rect <230,140,430,180>
+$output false
+resource Resources::Bitmap Image4
+{
+  attr bitmapfile FileName = .\Res\Img_04.jpg;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Bitmap resource for small photo images.
+$rect <440,20,640,60>
+$output false
+resource Resources::Bitmap Image5
+{
+  attr bitmapfile FileName = .\Res\Img_05.jpg;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Bitmap resource for small photo images.
+$rect <440,60,640,100>
+$output false
+resource Resources::Bitmap Image6
+{
+  attr bitmapfile FileName = .\Res\Img_06.jpg;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Bitmap resource for small photo images.
+$rect <440,100,640,140>
+$output false
+resource Resources::Bitmap Image7
+{
+  attr bitmapfile FileName = .\Res\Img_07.jpg;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<workspace>
+  <batchBuild>
+    <batchDefinition>
+      <name>all</name>
+      <member>
+        <project>EmbeddedWizard</project>
+        <configuration>SDRAM_Debug</configuration>
+      </member>
+      <member>
+        <project>EmbeddedWizard</project>
+        <configuration>SDRAM_Release</configuration>
+      </member>
+    </batchDefinition>
+    <batchDefinition>
+      <name>SDRAM_Debug</name>
+      <member>
+        <project>EmbeddedWizard</project>
+        <configuration>SDRAM_Debug</configuration>
+      </member>
+    </batchDefinition>
+    <batchDefinition>
+      <name>SDRAM_Release</name>
+      <member>
+        <project>EmbeddedWizard</project>
+        <configuration>SDRAM_Release</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
+  <project>
+    <path>$WS_DIR$/Project.ewp</path>
+  </project>
+</workspace>

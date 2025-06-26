@@ -1,0 +1,815 @@
+Release Name: MCUXpresso Software Development Kit (SDK)
+Release Version: 2.16.100
+Package License: LA_OPT_NXP_Software_License v56 April 2024 - Additional Distribution License granted, license in Section 2.3 applies
+
+maestro_framework          Name: Maestro Audio Framework                     
+                           Version: 1.8.0                                    
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: Source                                    
+                           Description: Maestro MCU Audio Framework          
+                           Location: middleware/maestro                      
+                           Origin: NXP (Proprietary) Flac (BSD 3-clause) Ogg 
+                           (BSD 3-clause) Opus (BSD 3-clause) Opusfile (BSD  
+                           3-clause)                                         
+                           Url: https://github.com/xiph/flac                 
+                           https://github.com/xiph/ogg                       
+                           https://github.com/xiph/opus                      
+                           https://github.com/xiph/opusfile                  
+
+SDK_Peripheral_Driver      Name: SDK Peripheral Driver                       
+                           Version: 2.x.x                                    
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code                               
+                           Description: Peripheral drivers are designed for  
+                           the most common use cases identified for the      
+                           underlying hardware block.                        
+                           Location: devices/<device>/drivers                
+                           Origin: NXP (BSD-3-Clause)                        
+
+SDK_Device                 Name: SDK SoC files                               
+                           Version: NA                                       
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code, linker files                 
+                           Description: Device system files, template files, 
+                           IDE related startup and linker files.             
+                           Location: devices/<device>/                       
+                           Origin: NXP (BSD-3-Clause)                        
+
+SDK_Components             Name: SDK components and board peripheral drivers 
+                           Version: NA                                       
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code                               
+                           Description: SDK components and board peripheral  
+                           drivers, for example, flash and codec drivers.    
+                           Location: components/                             
+                           Origin: NXP (BSD-3-Clause), ITE (BSD-3-Clause)    
+
+cmsis_drivers              Name: SDK CMSIS Peripheral Drivers                
+                           Version: 2.x.x                                    
+                           Outgoing License: Apache License 2.0              
+                           License File: CMSIS/LICENSE.txt                   
+                           Format: source code                               
+                           Description: CMSIS Peripheral drivers are designed
+                           to provide hardware independent APIs which make   
+                           application reusable across a wide range of       
+                           supported microcontroller devices.                
+                           Location: devices/<device>/cmsis_drivers          
+                           Origin: NXP (Apache-2.0) ARM (Apache-2.0) -       
+                           https://github.com/ARM-software/CMSIS_5/releases/t
+                           ag/5.8.0                                          
+
+CMSIS                      Name: CMSIS                                       
+                           Version: 5.9.0                                    
+                           Outgoing License: Apache License 2.0              
+                           License File: CMSIS/LICENSE.txt                   
+                           Format: source code                               
+                           Description: Vendor-independent hardware          
+                           abstraction layer for microcontrollers that are   
+                           based on Arm Cortex processors, distributed by    
+                           ARM. cores                                        
+                           Location: CMSIS/                                  
+                           Origin: ARM (Apache-2.0) -                        
+                           https://github.com/ARM-software/CMSIS_5/releases/t
+                           ag/5.9.0                                          
+
+canopen                    Name: EmSA CANopen (FD) Libraries                 
+                           Version: 7.1.0                                    
+                           Outgoing License: Modified BSD                    
+                           License File: middleware/canopen/LICENSE.INFO     
+                           Format: library, source code, header files        
+                           Description: EmSA CANopen (FD) Libraries for NXP  
+                           SDKs                                              
+                           Location: middleware/canopen                      
+                           Origin: EmSA                                      
+
+cjson                      Name: CJSON                                       
+                           Version: 1.7.4                                    
+                           Outgoing License: MIT                             
+                           License File: middleware/cjson/LICENSE            
+                           Format: source code                               
+                           Description: CJSON - Ultralightweight JSON parser 
+                           in ANSI C                                         
+                           Location: middleware/cjson                        
+                           Origin: Dave Gamble                               
+                           Url:                                              
+                           https://github.com/DaveGamble/cJSON/releases/tag/v
+                           1.7.4                                             
+
+wifi                       Name: NXP Wi-Fi driver                            
+                           Version: 1.3.48.p16                               
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code, header files, firmware       
+                           binaries                                          
+                           Description: NXP Wi-Fi driver and networking      
+                           utilities                                         
+                           Location: middleware/wifi_nxp                     
+                           Origin: NXP (BSD-3-Clause)                        
+
+wpa_supplicant             Name: wpa_supplicant-rtos                         
+                           Version: 2.11.0                                   
+                           Outgoing License: BSD-3-Clause                    
+                           License File:                                     
+                           middleware/wireless/wpa_supplicant-rtos/wpa_suppli
+                           cant/README                                       
+                           Format: source code                               
+                           Description: WPA Supplicant & HOSTAPD             
+                           Location: middleware/wireless/wpa_supplicant-rtos 
+                           Origin: https://w1.fi/wpa_supplicant/ and         
+                           https://w1.fi/hostapd/                            
+
+emwin                      Name: emWin                                       
+                           Version: 6.38                                     
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: Precompiled libraries, header files       
+                           Description: emWin graphics library               
+                           Location: middleware/emwin                        
+                           Origin: SEGGER Microcontroller Systems LLC        
+                           (Proprietary)                                     
+                           Url:                                              
+                           http://www.nxp.com/pages/emwin-graphics-library:EM
+                           WIN-GRAPHICS-LIBRARY                              
+
+dhara                      Name: Dhara                                       
+                           Version: 2.0.0                                    
+                           Outgoing License: ISC                             
+                           License File: middleware/dhara/LICENSE            
+                           Format: source code                               
+                           Description: Dhara - Dhara is a small flash       
+                           translation layer designed to be used in          
+                           resource-constrained systems for managing NAND    
+                           flash.                                            
+                           Location: middleware/dhara                        
+                           Origin: Daniel Beer (https://github.com/dlbeer/)  
+                           Url: https://github.com/dlbeer/dhara              
+
+fatfs                      Name: FatFs                                       
+                           Version: R0.15                                    
+                           Outgoing License: FatFs License                   
+                           Approved open source license: Yes                 
+                           License File: middleware/fatfs/LICENSE.txt        
+                           Format: source code                               
+                           Description: Generic FAT file system for small    
+                           embedded devices.                                 
+                           Location: middleware/fatfs                        
+                           Origin: Electronic Lives Mfg. by ChaN of Ageo     
+                           city, Japan (FatFs License)                       
+                           Url: http://elm-chan.org/fsw/ff/00index_e.html    
+
+device-defender            Name: AWS IoT Device Defender Library             
+                           Version: 1.3.0                                    
+                           Outgoing License: MIT                             
+                           License File:                                     
+                           middleware/aws_iot/device-defender/LICENSE        
+                           Format: source code, header files                 
+                           Description: Client library for using the AWS IoT 
+                           Device Defender service on embedded devices.      
+                           Location: middleware/aws_iot/device-defender      
+                           Origin: Amazon (MIT)                              
+                           Url:                                              
+                           https://github.com/aws/Device-Defender-for-AWS-IoT
+                           -embedded-sdk                                     
+
+device-shadow              Name: AWS IoT Device Shadow library               
+                           Version: 1.3.0                                    
+                           Outgoing License: MIT                             
+                           License File:                                     
+                           middleware/aws_iot/device-shadow/LICENSE          
+                           Format: source code, header files                 
+                           Description: Client library for using the AWS IoT 
+                           Device Shadow service on embedded devices.        
+                           Location: middleware/aws_iot/device-shadow        
+                           Origin: Amazon (MIT)                              
+                           Url:                                              
+                           https://github.com/aws/device-shadow-for-aws-iot-e
+                           mbedded-sdk                                       
+
+iot_reference              Name: AWS IoT Reference Integration               
+                           Version: 1.3.0                                    
+                           Outgoing License: MIT                             
+                           License File:                                     
+                           middleware/aws_iot/iot-reference/LICENSE          
+                           Format: source code, header files                 
+                           Description: AWS IoT Reference Integration        
+                           Location: middleware/aws_iot/iot-reference        
+                           Origin: Amazon (MIT)                              
+                           Url:                                              
+                           https://github.com/FreeRTOS/iot-reference-nxp-rt10
+                           60                                                
+
+jobs                       Name: AWS IoT Jobs library                        
+                           Version: 1.3.0                                    
+                           Outgoing License: MIT                             
+                           License File: middleware/aws_iot/jobs/LICENSE     
+                           Format: source code                               
+                           Description: Library for using the AWS IoT Jobs   
+                           service on embedded devices.                      
+                           Location: middleware/aws_iot/jobs                 
+                           Origin: Amazon (MIT)                              
+                           Url:                                              
+                           https://github.com/aws/Jobs-for-AWS-IoT-embedded-s
+                           dk                                                
+
+ota                        Name: AWS IoT Over-the-air Update Library         
+                           Version: 3.4.0                                    
+                           Outgoing License: MIT                             
+                           License File: middleware/aws_iot/ota/LICENSE      
+                           Format: source code, header files                 
+                           Description: Client library for using the AWS     
+                           Over-the-air Update service on embedded devices.  
+                           Location: middleware/aws_iot/ota                  
+                           Origin: Amazon (MIT)                              
+                           Url:                                              
+                           https://github.com/aws/ota-for-aws-iot-embedded-sd
+                           k                                                 
+
+backoffalgorithm           Name: FreeRTOS backoffalgorithm                   
+                           Version: 1.3.0                                    
+                           Outgoing License: MIT                             
+                           License File:                                     
+                           rtos/freertos/backoffalgorithm/LICENSE            
+                           Format: source code, header files                 
+                           Description: Algorithm for calculating exponential
+                           backoff with jitter for network retry attempts.   
+                           Location: rtos/freertos/backoffalgorithm          
+                           Origin: Amazon (MIT)                              
+                           Url: https://github.com/FreeRTOS/backoffAlgorithm 
+
+corejson                   Name: FreeRTOS coreJSON                           
+                           Version: 3.2.0                                    
+                           Outgoing License: MIT                             
+                           License File: rtos/freertos/corejson/LICENSE      
+                           Format: source code, header files                 
+                           Description: JSON parser                          
+                           Location: rtos/freertos/corejson                  
+                           Origin: Amazon (MIT)                              
+                           Url: https://github.com/FreeRTOS/coreJSON         
+
+coremqtt                   Name: FreeRTOS coreMQTT                           
+                           Version: 2.1.1                                    
+                           Outgoing License: MIT                             
+                           License File: rtos/freertos/coremqtt/LICENSE      
+                           Format: source code, header files                 
+                           Description: MQTT publish/subscribe messaging     
+                           library                                           
+                           Location: rtos/freertos/coremqtt                  
+                           Origin: Amazon (MIT)                              
+                           Url: https://github.com/FreeRTOS/coremqtt         
+
+coremqtt-agent             Name: FreeRTOS coreMQTT agent                     
+                           Version: 1.2.0                                    
+                           Outgoing License: MIT                             
+                           License File: rtos/freertos/coremqtt-agent/LICENSE
+                           Format: source code, header files                 
+                           Description: The coreMQTT Agent library is a high 
+                           level API that adds thread safety to the coreMQTT 
+                           library.                                          
+                           Location: rtos/freertos/coremqtt-agent            
+                           Origin: Amazon (MIT)                              
+                           Url: https://github.com/FreeRTOS/coreMQTT-Agent   
+
+corepkcs11                 Name: FreeRTOS corePKCS11                         
+                           Version: 3.5.0                                    
+                           Outgoing License: MIT                             
+                           License File: rtos/freertos/corepkcs11/LICENSE    
+                           Format: source code, header files                 
+                           Description: PKCS #11 key management library      
+                           Location: rtos/freertos/corepkcs11                
+                           Origin: Amazon (MIT)                              
+                           Url: https://github.com/FreeRTOS/corePKCS11       
+
+freertos-kernel            Name: FreeRTOS kernel                             
+                           Version: 11.0.1                                   
+                           Outgoing License: MIT                             
+                           License File:                                     
+                           rtos/freertos/freertos-kernel/LICENSE.md          
+                           Format: source code                               
+                           Description: Open source RTOS kernel for small    
+                           devices                                           
+                           Location: rtos/freertos/freertos-kernel           
+                           Origin: Amazon (MIT)                              
+                           Url: https://github.com/FreeRTOS/FreeRTOS-Kernel  
+
+corehttp                   Name: FreeRTOS coreHTTP                           
+                           Version: 3.0.0                                    
+                           Outgoing License: MIT                             
+                           License File: rtos/freertos/corehttp/LICENSE      
+                           Format: source code, header files                 
+                           Description: C language HTTP client library       
+                           designed for embedded platforms                   
+                           Location: rtos/freertos/corehttp                  
+                           Origin: Amazon (MIT)                              
+                           Url: https://github.com/FreeRTOS/coreHTTP         
+
+freertos-plus-tcp          Name: FreeRTOS Plus TCP                           
+                           Version: 4.0.0                                    
+                           Outgoing License: MIT                             
+                           License File:                                     
+                           rtos/freertos/freertos-plus-tcp/LICENSE.md        
+                           Format: source code, header files                 
+                           Description: FreeRTOS Plus TCP                    
+                           Location: rtos/freertos/freertos-plus-tcp         
+                           Origin: Amazon (MIT)                              
+                           Url: https://github.com/FreeRTOS/freertos-plus-tcp
+
+libjpeg                    Name: LIBJPEG                                     
+                           Version: 9b                                       
+                           Outgoing License: IJG                             
+                           License File: middleware/libjpeg/README           
+                           Format: source code                               
+                           Description: JPEG image encoding, decoding, and   
+                           transcoding                                       
+                           Location: middleware/libjpeg                      
+                           Origin: IJG (IJG) - http://www.ijg.org            
+
+littlefs                   Name: LittleFS                                    
+                           Version: 2.9.1                                    
+                           Outgoing License: BSD-3-Clause                    
+                           License File: middleware/littlefs/LICENSE.md      
+                           Format: source code                               
+                           Description: LittleFS - A little fail-safe        
+                           filesystem designed for microcontrollers          
+                           Location: middleware/littlefs                     
+                           Origin: Christopher Haster                        
+                           (https://github.com/geky/)                        
+                           Url: https://github.com/littlefs-project/littlefs 
+
+pngdec                     Name: PNGdec                                      
+                           Version: 1.0.1                                    
+                           Outgoing License: Apache-2.0                      
+                           License File: middleware/pngdec/LICENSE           
+                           Format: source code                               
+                           Description: An embedded-friendly PNG image       
+                           decoding library.                                 
+                           Location: middleware/pngdec                       
+                           Origin: Written by Larry Bank, bitbank@pobox.com  
+                           Url: https://github.com/bitbank2/PNGdec/tree/1.0.1
+
+llhttp                     Name: llhttp                                      
+                           Version: 6.0.9                                    
+                           Outgoing License: MIT                             
+                           License File: middleware/llhttp/LICENSE-MIT       
+                           Format: source code                               
+                           Description: HTTP parser in LLVM IR               
+                           Location: middleware/llhttp                       
+                           Origin: Node.js (MIT)                             
+                           Url: https://github.com/nodejs/llhttp             
+
+lwip                       Name: lwIP TCP/IP Stack                           
+                           Version: lwIP git repository (2024-02-19, branch: 
+                           master, SHA-1:                                    
+                           d0efd9ef7ba08e54b46b1060e2b4629a4907391b)         
+                           Outgoing License: BSD-3-Clause                    
+                           License File: middleware/lwip/COPYING             
+                           Format: source code                               
+                           Description: A light-weight TCP/IP stack          
+                           Location: middleware/lwip                         
+                           Origin: NXP (BSD-3-Clause) Swedish Institute of   
+                           Computer Science (BSD-3-Clause) -                 
+                           http://savannah.nongnu.org/projects/lwip          
+
+mcuboot                    Name: MCUBoot                                     
+                           Version: 2.0.0                                    
+                           Outgoing License: Apache-2.0                      
+                           License File:                                     
+                           middleware/mcuboot_opensource/LICENSE             
+                           Format: source code                               
+                           Description: MCUBoot - a bootloader for           
+                           microcontrollers                                  
+                           Location: middleware/mcuboot_opensource           
+                           Origin: MCUBoot https://www.mcuboot.com/          
+                           Url: https://github.com/mcu-tools/mcuboot         
+
+multicore                  Name: Multicore SDK                               
+                           Version: 2.16.0                                   
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code                               
+                           Description: NXP Multicore Software Development   
+                           Kit.                                              
+                           Location: middleware/multicore                    
+                           Origin: NXP (BSD-3-Clause)                        
+
+openh264                   Name: OpenH264                                    
+                           Version: 2.1.1                                    
+                           Outgoing License: BSD-2-Clause                    
+                           License File: middleware/openh264/LICENSE         
+                           Format: source code                               
+                           Description: Codec library which supports H.264   
+                           encoding and decoding                             
+                           Location: middleware/openh264                     
+                           Origin: Cisco (BSD-2-Clause) -                    
+                           https://github.com/cisco/openh264/tree/v2.1.1     
+
+pkcs11                     Name: OASIS TC pkcs11                             
+                           Version: 2.40.1                                   
+                           Outgoing License: MIT                             
+                           License File: middleware/pkcs11/LICENSE.md        
+                           Format: source code                               
+                           Description: Public Key Cryptography Standard #11 
+                           defines generic cryptographic token interface.    
+                           Location: middleware/pkcs11                       
+                           Origin: OASIS TC, Amazon (MIT)                    
+                           Url: https://github.com/amazon-freertos/pkcs11    
+
+mbedtls                    Name: Mbed TLS                                    
+                           Version: 2.28.8                                   
+                           Outgoing License: Apache-2.0                      
+                           License File: middleware/mbedtls/LICENSE          
+                           Format: source code                               
+                           Description: Cryptographic and SSL/TLS Library    
+                           Location: middleware/mbedtls                      
+                           Origin: ARM(Apache-2.0) -                         
+                           https://github.com/Mbed-TLS/mbedtls/releases/tag/v
+                           2.28.3                                            
+
+sdmmc                      Name: SD MMC SDIO Card middleware                 
+                           Version: 2.2.7                                    
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code                               
+                           Description: A software component support SD card,
+                           eMMC card, SDIO card.                             
+                           Location: middleware/sdmmc                        
+                           Origin: NXP (BSD-3-Clause)                        
+
+soem                       Name: Simple Open EtherCAT Master Library (SOEM)  
+                           Version: 1.4.0                                    
+                           Outgoing License: GPL-2.0 with a special exception
+                           License File: middleware/soem/LICENSE             
+                           Format: source code                               
+                           Description: An opensource EtherCAT master stack  
+                           which is used to write custom EtherCAT Master     
+                           applications.                                     
+                           Location: middleware/soem                         
+                           Origin: RT-Labs                                   
+                           Url: https://github.com/OpenEtherCATsociety/soem  
+
+tinycbor                   Name: TinyCBOR                                    
+                           Version: 0.6.0                                    
+                           Outgoing License: MIT                             
+                           License File: middleware/tinycbor/LICENSE         
+                           Format: source code                               
+                           Description: TinyCBOR                             
+                           Location: middleware/tinycbor                     
+                           Origin: Intel Corporation (MIT)                   
+                           Url: https://github.com/intel/TinyCBOR            
+
+usb                        Name: USB                                         
+                           Version: 2.10.1                                   
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code                               
+                           Description: NXP USB stack. This is a version of  
+                           the USB stack that has been integrated with the   
+                           MCUXpresso SDK.                                   
+                           Location: middleware/usb                          
+                           Origin: NXP (BSD-3-Clause)                        
+
+vit                        Name: VIT_v4.10.0                                 
+                           Version: 4.10.0                                   
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: Precompiled libraries, header files,      
+                           example application                               
+                           Description: Voice Intelligent Technology library 
+                           Location: middleware/vit                          
+                           Origin: NXP (Proprietary)                         
+
+voice_seeker_cm7           Name: VoiceSeeker (no AEC)                        
+                           Version: 0.6.9                                    
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: Precompiled libraries, header files,      
+                           example application                               
+                           Description: VoiceSeeker is a multi-microphone    
+                           voice control audio front-end signal processing   
+                           solution. Acoustic Echo Cancellation (AEC) is not 
+                           enabled in this free version.                     
+                           Location: middleware/voice_seeker/ARM_CortexM7    
+                           Origin: NXP (Proprietary) ARM (Apache-2.0)        
+                           Url:                                              
+                           https://www.nxp.com/design/software/embedded-softw
+                           are/voiceseeker-audio-front-end:VOICESEEKER       
+                           https://github.com/ARM-software/CMSIS_5           
+
+wifi_tx_pwr_limits         Name: Wi-Fi module Tx power limits                
+                           Version: 1.0.0                                    
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code                               
+                           Description: Wi-Fi module Tx power limits         
+                           Location: components/wifi_bt_module/Murata        
+                           Origin: Murata Manufacturing Co., Ltd.            
+                           (BSD-3-Clause)                                    
+
+lvgl                       Name: LVGL                                        
+                           Version: 8.3.10                                   
+                           Outgoing License: MIT                             
+                           License File: middleware/lvgl/lvgl/LICENCE.txt    
+                           Format: source code                               
+                           Description: Light and Versatile Graphics Library 
+                           (LVGL)                                            
+                           Location: middleware/lvgl                         
+                           Origin: Gabor Kiss-Vamosi -                       
+                           https://github.com/lvgl/lvgl Lodepng (Zlib)       
+
+edgefast_bluetooth         Name: EdgeFast Protocol Abstraction Layer         
+                           Version: 1.5.0                                    
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code, header files                 
+                           Description: EdgeFast Bluetooth PAL               
+                           Location: middleware/edgefast_bluetooth           
+                           Origin: NXP (BSD-3-Clause) Zephyr BT/BLE Host     
+                           stack (Apache-2.0) -                              
+                           https://github.com/zephyrproject-rtos/zephyr/tree/
+                           v2.6-branch/subsys/bluetooth                      
+
+bt_ble_hoststack           Name: Bluetooth and Bluetooth Low Energy Host     
+                           Stack                                             
+                           Version: 20.11.0                                  
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: Source, Binary libraries                  
+                           Description: Bluetooth and Bluetooth Low Energy   
+                           Host Stack.                                       
+                           Location: middleware/wireless/ethermind           
+                           Origin: Mindtree (Proprietary） NXP (BSD-3-Clause) 
+
+se_hostlib                 Name: se_hostlib                                  
+                           Version: 2.12.0                                   
+                           Outgoing License: Plug & Trust Middleware License 
+                           License File: middleware/se_hostlib/EULA.pdf      
+                           Format: source code                               
+                           Description: Secure element host library          
+                           Location: middleware/se_hostlib                   
+                           Origin: NXP (Proprietary)                         
+
+mcu-boot                   Name: Bootloader Source                           
+                           Version: 2.7.0                                    
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code                               
+                           Description: Software for Bootloaders,            
+                           Flashloaders and host tools                       
+                           Location: middleware/mcu_bootloader               
+                           Origin: NXP (BSD-3-Clause)                        
+
+issdk                      Name: ISSDK                                       
+                           Version: 1.8                                      
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code                               
+                           Description: NXP IoT Sensing SDK. It combines a   
+                           set of robust Sensor Drivers and algorithms along 
+                           with example applications.                        
+                           Location: middleware/issdk                        
+                           Origin: NXP (BSD-3-Clause)                        
+
+eiq_tensorflow_lite        Name: TensorFlow Lite for Microcontrollers        
+                           Version: 23-09-18 (commit dc64e48)                
+                           Outgoing License: Apache-2.0                      
+                           License File:                                     
+                           middleware/eiq/tensorflow-lite/LICENSE            
+                           Format: source code                               
+                           Description: Software library for running machine 
+                           learning models on embedded devices               
+                           Location: middleware/eiq/tensorflow-lite          
+                           Origin: See middleware/eiq/tensorflow-lite/AUTHORS
+                           Url: https://github.com/tensorflow/tensorflow     
+
+eiq_FFT2D                  Name: FFT2D                                       
+                           Version: NA                                       
+                           Outgoing License: Public Domain                   
+                           License File:                                     
+                           middleware/eiq/tensorflow-lite/third_party/fft2d/L
+                           ICENSE                                            
+                           Format: source code                               
+                           Description: FFT package in C                     
+                           Location:                                         
+                           middleware/eiq/tensorflow-lite/third_party/fft2d  
+                           Origin: Takuya Ooura                              
+                           Url:                                              
+                           http://www.kurims.kyoto-u.ac.jp/~ooura/fft.html   
+
+eiq_FlatBuffers            Name: FlatBuffers                                 
+                           Version: 2.0.6 (commit a66de58)                   
+                           Outgoing License: Apache-2.0                      
+                           License File:                                     
+                           middleware/eiq/tensorflow-lite/third_party/flatbuf
+                           fers/LICENSE.txt                                  
+                           Format: source code                               
+                           Description: Cross platform serialization library 
+                           Location:                                         
+                           middleware/eiq/tensorflow-lite/third_party/flatbuf
+                           fers                                              
+                           Origin: https://google.github.io/flatbuffers      
+                           Url: https://github.com/google/flatbuffers        
+
+eiq_gemmlowp               Name: gemmlowp                                    
+                           Version: NA (commit 719139c)                      
+                           Outgoing License: Apache-2.0                      
+                           License File:                                     
+                           middleware/eiq/tensorflow-lite/third_party/gemmlow
+                           p/LICENSE                                         
+                           Format: source code                               
+                           Description: A small self-contained low-precision 
+                           GEMM library                                      
+                           Location:                                         
+                           middleware/eiq/tensorflow-lite/third_party/gemmlow
+                           p                                                 
+                           Origin: See                                       
+                           middleware/eiq/tensorflow-lite/third_party/gemmlow
+                           p/AUTHORS                                         
+                           Url: https://github.com/google/gemmlowp           
+
+eiq_KissFFT                Name: Kiss FFT                                    
+                           Version: 1.3.0                                    
+                           Outgoing License: BSD-3-Clause                    
+                           License File:                                     
+                           middleware/eiq/tensorflow-lite/third_party/kissfft
+                           /COPYING                                          
+                           Format: source code                               
+                           Description: A mixed-radix Fast Fourier Transform 
+                           library                                           
+                           Location:                                         
+                           middleware/eiq/tensorflow-lite/third_party/kissfft
+                           Origin: Mark Borgerding                           
+                           Url: https://github.com/mborgerding/kissfft       
+
+eiq_ruy                    Name: ruy                                         
+                           Version: NA (commit d371283)                      
+                           Outgoing License: Apache-2.0                      
+                           License File:                                     
+                           middleware/eiq/tensorflow-lite/third_party/ruy/LIC
+                           ENSE                                              
+                           Format: source code                               
+                           Description: The ruy matrix multiplication library
+                           Location:                                         
+                           middleware/eiq/tensorflow-lite/third_party/ruy    
+                           Origin: Google, Inc.                              
+                           Url: https://github.com/google/ruy                
+
+eiq_tensorflow_lite_micro_cName: CMSIS-NN library                            
+msis_nn                    Version: 23.08 (commit dc64e48)                   
+                           Outgoing License: Apache-2.0                      
+                           License File:                                     
+                           middleware/eiq/tensorflow-lite/third_party/cmsis_n
+                           n/LICENSE.txt                                     
+                           Format: source code                               
+                           Description: A neural network kernels library for 
+                           Cortex-M cores from ARM                           
+                           Location:                                         
+                           middleware/eiq/tensorflow-lite/third_party/cmsis_n
+                           n                                                 
+                           Origin: ARM                                       
+                           Url: https://github.com/ARM-software/CMSIS-NN     
+
+azure_rtos_threadx         Name: Azure RTOS ThreadX                          
+                           Version: 6.4.1                                    
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: source code                               
+                           Description: RTOS kernel for microcontrollers     
+                           Location: rtos/azure-rtos/threadx                 
+                           Origin: Eclipse Foundation                        
+                           Url: https://threadx.io/                          
+
+azure_rtos_filex           Name: Azure RTOS FileX                            
+                           Version: 6.4.1                                    
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: source code                               
+                           Description: file system                          
+                           Location: rtos/azure-rtos/filex                   
+                           Origin: Eclipse Foundation                        
+                           Url: https://threadx.io/                          
+
+azure_rtos_levelx          Name: Azure RTOS LevelX                           
+                           Version: 6.4.1                                    
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: source code                               
+                           Description: NAND and NOR flash wear leveling     
+                           facilities for embedded applications              
+                           Location: rtos/azure-rtos/levelx                  
+                           Origin: Eclipse Foundation                        
+                           Url: https://threadx.io/                          
+
+azure_rtos_netxduo         Name: Azure RTOS NetX Duo                         
+                           Version: 6.4.1                                    
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: source code                               
+                           Description: advanced, industrial-grade TCP/IP    
+                           network stack                                     
+                           Location: rtos/azure-rtos/netxduo                 
+                           Origin: Eclipse Foundation                        
+                           Url: https://threadx.io/                          
+
+azure_rtos_guix            Name: Azure RTOS GUIX                             
+                           Version: 6.4.1                                    
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: source code                               
+                           Description: advanced, industrial-grade GUI       
+                           solution                                          
+                           Location: rtos/azure-rtos/guix                    
+                           Origin: Eclipse Foundation                        
+                           Url: https://threadx.io/                          
+
+azure_rtos_usbx            Name: Azure RTOS USBX                             
+                           Version: 6.4.1                                    
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: source code                               
+                           Description: A high-performance USB host and      
+                           device embedded stack                             
+                           Location: rtos/azure-rtos/usbx                    
+                           Origin: Eclipse Foundation                        
+                           Url: https://threadx.io/                          
+
+fmstr                      Name: FreeMASTER                                  
+                           Version: 3.0.7                                    
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: source code & header files                
+                           Description: FreeMASTER communication driver      
+                           Location: middleware/freemaster/src               
+                           Origin: NXP                                       
+
+segger_rtt                 Name: SEGGER Real Timer Transfer                  
+                           Version: 7.22                                     
+                           Outgoing License: LA_OPT_NXP_Software_License v56 
+                           April 2024 - Additional distribution license      
+                           granted, license in Section 2.3 applies           
+                           License File: LA_OPT_NXP_Software_License.txt     
+                           Format: source code                               
+                           Description: SEGGER Real Timer Transfer           
+                           Location: components/rtt                          
+                           Origin: SEGGER Microcontroller (proprietary)      
+
+SDK_Examples               Name: SDK examples                                
+                           Version: NA                                       
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code, binary, project files, linker
+                           files                                             
+                           Description: SDK out of box examples to show how  
+                           to use peripheral drivers and integrate           
+                           middleware.                                       
+                           Location: boards/<board>/                         
+                           Origin: NXP (BSD-3-Clause)                        
+
+RangeHTTPServer            Name: RangeHTTPServer                             
+                           Version: 1.2.0                                    
+                           Outgoing License: Apache-2.0                      
+                           License File:                                     
+                           https://www.apache.org/licenses/LICENSE-2.0.txt   
+                           Format: source code                               
+                           Description: Python SimpleHTTPServer extension for
+                           support of HTTP Range Requests                    
+                           Location:                                         
+                           boards/<board>/ota_examples/ota_mcuboot_client/htt
+                           ps_server                                         
+                           Url: https://github.com/danvk/RangeHTTPServer     
+                           Origin: https://github.com/danvk/RangeHTTPServer  
+
+fmstr-examples             Name: FreeMASTER examples                         
+                           Version: 3.0.7                                    
+                           Outgoing License: BSD-3-Clause                    
+                           License File: COPYING-BSD-3                       
+                           Format: source code & header files                
+                           Description: FreeMASTER example applications      
+                           Location: boards/<board>/freemaster_examples      
+                           Origin: NXP                                       

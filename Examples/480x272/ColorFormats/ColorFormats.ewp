@@ -1,0 +1,221 @@
+$version 14.00
+
+// This unit is a part of the Embedded Wizard framework 'Mosaic'
+$rect <40,80,240,120>
+unit Core
+{
+  attr Directory = $Mosaic;
+}
+
+// This unit is a part of the Embedded Wizard framework 'Mosaic'
+$rect <40,120,240,160>
+unit Resources
+{
+  attr Directory = $Mosaic;
+}
+
+// This unit is a part of the Embedded Wizard framework 'Mosaic'
+$rect <40,160,240,200>
+unit Graphics
+{
+  attr Directory = $Mosaic;
+}
+
+// This unit is a part of the Embedded Wizard framework 'Mosaic'
+$rect <40,200,240,240>
+unit Effects
+{
+  attr Directory = $Mosaic;
+}
+
+// This unit is a part of the Embedded Wizard framework 'Mosaic'
+$rect <40,240,240,280>
+unit Views
+{
+  attr Directory = $Mosaic;
+}
+
+// The 'default' Language. Each project has to contain at least one language brick \
+// called 'Default'
+$rect <540,80,740,120>
+language Default;
+
+// The unit of the application class
+$rect <540,260,740,300>
+unit Application
+{
+  attr Directory = .\;
+}
+
+// Mosaic Framework
+note group Note1
+{
+  attr Bounds = <20,20,260,330>;
+}
+
+// Profile Configuration
+note group Note2
+{
+  attr Bounds = <270,20,510,330>;
+}
+
+// Languages
+note group Note3
+{
+  attr Bounds = <520,20,760,170>;
+}
+
+// Implementation of the ColorFormats example
+note group Note4
+{
+  attr Bounds = <520,180,760,330>;
+}
+
+// This project is called 'ColorFormats'. It contains a simple but color-rich UI \
+// application with a couple of gradients, colored text items and images.
+// 
+// The project contains profiles for the following color formats:
+// - RGBA8888 using a 32 bit color format with 8 bit red, 8 bit green, 8 bit blue \
+// and 8 bit alpha per pixel.
+// - RGB888 using a 24 bit color format with 8 bit red, 8 bit green and 8 bit blue \
+// per pixel.
+// - RGB565 using a 16 bit color format with 5 bit red, 6 bit green and 5 bit blue \
+// per pixel.
+// - Index8 using a 8 bit color format, each pixel is a 8 bit index into a color \
+// look-up table (CLUT).
+// - LumA44 using a 8 bit grayscale format, each pixel contains 4 bit luminance and \
+// 4 bit alpha.
+//
+// You can double-click on the 'Application' brick to open the unit within the Composer.
+// 
+// To generate code for the target, select the desired profile within the drop-down \
+// box and press 'F8'.
+note legend Note5
+{
+  attr Bounds = <20,340,760,620>;
+}
+
+// This is a profile member for the project. This profile controls the code generation \
+// for the target system.
+$rect <290,80,490,120>
+profile iMX_RT_RGBA8888 : NXP.iMX_RT.RGBA8888
+{
+  attr ScreenSize = <480,272>;
+  attr Optimization = High;
+  attr ApplicationClass = Application::Application;
+  attr CleanOutputDirectories = true;
+  attr OutputFileNameExtension = c;
+  attr Verbose = false;
+  attr ScreenOrientation = Normal;
+  attr OutputDirectory = ..\..\..\Application\GeneratedCode;
+  attr ModeOfBitmapResources = Compressed;
+  attr ModeOfStringConstants = Compressed;
+  attr FontConversion = Windows;
+
+  $rect <10,10,154,50>
+  macro Author = "Dipl. Ing. Paul Banach and Dipl. Ing. Manfred Schweyer, Copyright (C) TARA Systems GmbH";
+
+  // This macro contains the name of the currently used color format as string.
+  $rect <10,60,210,100>
+  macro ColorFormatName = "RGBA8888";
+}
+
+// This is a profile member for the project. This profile controls the code generation \
+// for the target system.
+$rect <290,120,490,160>
+profile iMX_RT_RGB888 : NXP.iMX_RT.RGB888
+{
+  attr ScreenSize = <480,272>;
+  attr Optimization = High;
+  attr ApplicationClass = Application::Application;
+  attr CleanOutputDirectories = true;
+  attr OutputFileNameExtension = c;
+  attr Verbose = false;
+  attr ScreenOrientation = Normal;
+  attr OutputDirectory = ..\..\..\Application\GeneratedCode;
+  attr ModeOfBitmapResources = Compressed;
+  attr ModeOfStringConstants = Compressed;
+  attr FontConversion = Windows;
+
+  $rect <10,10,154,50>
+  macro Author = "Dipl. Ing. Paul Banach and Dipl. Ing. Manfred Schweyer, Copyright (C) TARA Systems GmbH";
+
+  // This macro contains the name of the currently used color format as string.
+  $rect <10,60,210,100>
+  macro ColorFormatName = "RGB888";
+}
+
+// This is a profile member for the project. This profile controls the code generation \
+// for the target system.
+$rect <290,160,490,200>
+profile iMX_RT_RGB565 : NXP.iMX_RT.RGB565
+{
+  attr ScreenSize = <480,272>;
+  attr Optimization = High;
+  attr ApplicationClass = Application::Application;
+  attr CleanOutputDirectories = true;
+  attr OutputFileNameExtension = c;
+  attr Verbose = false;
+  attr ScreenOrientation = Normal;
+  attr OutputDirectory = ..\..\..\Application\GeneratedCode;
+  attr ModeOfBitmapResources = Compressed;
+  attr ModeOfStringConstants = Compressed;
+  attr FontConversion = Windows;
+
+  $rect <10,10,154,50>
+  macro Author = "Dipl. Ing. Paul Banach and Dipl. Ing. Manfred Schweyer, Copyright (C) TARA Systems GmbH";
+
+  // This macro contains the name of the currently used color format as string.
+  $rect <10,60,210,100>
+  macro ColorFormatName = "RGB565";
+}
+
+// This is a profile member for the project. This profile controls the code generation \
+// for the target system.
+$rect <290,200,490,240>
+profile iMX_RT_Index8 : NXP.iMX_RT.Index8
+{
+  attr ScreenSize = <480,272>;
+  attr Optimization = High;
+  attr ApplicationClass = Application::Application;
+  attr CleanOutputDirectories = true;
+  attr OutputFileNameExtension = c;
+  attr Verbose = false;
+  attr ScreenOrientation = Normal;
+  attr OutputDirectory = ..\..\..\Application\GeneratedCode;
+  attr ModeOfBitmapResources = Compressed;
+  attr ModeOfStringConstants = Compressed;
+  attr FontConversion = Windows;
+
+  $rect <10,10,154,50>
+  macro Author = "Dipl. Ing. Paul Banach and Dipl. Ing. Manfred Schweyer, Copyright (C) TARA Systems GmbH";
+
+  // This macro contains the name of the currently used color format as string.
+  $rect <10,60,210,100>
+  macro ColorFormatName = "Index8";
+}
+
+// This is a profile member for the project. This profile controls the code generation \
+// for the target system.
+$rect <290,240,490,280>
+profile iMX_RT_LumA44 : NXP.iMX_RT.LumA44
+{
+  attr ScreenSize = <480,272>;
+  attr Optimization = High;
+  attr ApplicationClass = Application::Application;
+  attr CleanOutputDirectories = true;
+  attr OutputFileNameExtension = c;
+  attr Verbose = false;
+  attr ScreenOrientation = Normal;
+  attr OutputDirectory = ..\..\..\Application\GeneratedCode;
+  attr ModeOfBitmapResources = Compressed;
+  attr ModeOfStringConstants = Compressed;
+  attr FontConversion = Windows;
+
+  $rect <10,10,154,50>
+  macro Author = "Dipl. Ing. Paul Banach and Dipl. Ing. Manfred Schweyer, Copyright (C) TARA Systems GmbH";
+
+  // This macro contains the name of the currently used color format as string.
+  $rect <10,60,210,100>
+  macro ColorFormatName = "LumA44";
+}

@@ -1,0 +1,190 @@
+﻿$version 14.00
+
+// This is the root component of the entire GUI application.
+$rect <20,20,220,60>
+$output false
+class Application : Core::Root
+{
+  $rect <0,300,200,340>
+  inherited property Bounds = <0,0,480,272>;
+
+  // This is the Application class of the HelloWorld example.
+  // 
+  // The visible area of the application (the thick blue border) contains a couple \
+  // of views from the Gallery folder 'Views':
+  // - the gray background rectangle (filled rectangle)
+  // - a text view for the caption
+  // - three text views for the description text
+  // - an image object to display the icon
+  // 
+  // You can simply add other views from the Gallery by drag and drop.
+  // 
+  // Additionally, the application contains a simple touch handler from the Gallery \
+  // folder 'Event Handlers'.
+  // The touch handler is connected with the slot method 'OnTouch' - each time you \
+  // touch the screen, the method 'OnTouch' will be called.
+  // You can double-click on the 'OnTouch' brick to see the implementation in the \
+  // Code Editor: The position of the Logo image is set to the touch position.
+  // 
+  // To run the application within the Prototyper, press 'F5'.
+  // 
+  // To generate code for the target, press 'F8'.
+  note legend Note1
+  {
+    attr Bounds = <10,350,900,690>;
+  }
+
+  // This is a generic touch handler.
+  $rect <20,20,160,60>
+  object Core::SimpleTouchHandler SimpleTouchHandler
+  {
+    preset Point4 = <0,0>;
+    preset Point3 = <480,0>;
+    preset Point2 = <480,272>;
+    preset Point1 = <0,272>;
+    preset OnDrag = OnTouch;
+    preset OnPress = OnTouch;
+  }
+
+  // This is a filled rectangle view.
+  $rect <20,20,160,60>
+  object Views::Rectangle Rectangle
+  {
+    preset Bounds = <0,0,480,272>;
+    preset Color = #565656FF;
+  }
+
+  // This is an image view.
+  $rect <20,20,160,60>
+  object Views::Image Image
+  {
+    preset Bounds = <360,20,456,116>;
+    preset AutoSize = true;
+    preset Bitmap = Application::Logo;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Text3
+  {
+    preset Bounds = <10,240,470,275>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzCenter, AlignVertCenter];
+    preset String = "www.embedded-wizard.de";
+    preset Font = Application::FontSmall;
+    preset Color = #FFFFFFFF;
+  }
+
+  // This is a slot method connected with the touch handler. Each time the user touches \
+  // on the screen, this method is called. As a result, the position of the logo \
+  // image will be changed.
+  $rect <210,300,410,340>
+  slot OnTouch
+  {
+    sender; /* the method is called from the sender object */
+
+    /* just modify the position of the image:
+       get the touch position from the touch handler, adjust the position by half size of the image,
+       in order to put the center of the image to the touched position */
+    Image.Bounds.origin = SimpleTouchHandler.CurrentPos - point ( Image.Bounds.w / 2, Image.Bounds.h / 2 );
+
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Caption
+  {
+    preset Bounds = <20,20,340,90>;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertTop];
+    preset String = "Hello World,\nHello Embedded Wizard!";
+    preset Font = Application::FontLarge;
+    preset Color = #FFFFFFFF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Text1
+  {
+    preset Bounds = <20,90,360,160>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "This is a simple UI application,\ncontaining some text views and a logo image.";
+    preset Font = Application::FontSmall;
+    preset Color = #FFFFFFFF;
+  }
+
+  // This is an ordinary text view.
+  $rect <20,20,160,60>
+  object Views::Text Text2
+  {
+    preset Bounds = <20,160,390,230>;
+    preset WrapText = true;
+    preset Alignment = Views::TextAlignment[AlignHorzLeft, AlignVertCenter];
+    preset String = "Additionally, a touch handler receives touch events\nin order to change the position of the logo.\nJust touch on the screen...";
+    preset Font = Application::FontSmall;
+    preset Color = #FFFFFFFF;
+  }
+}
+
+// Font resource for large font - used for the caption text items.
+$rect <230,20,430,60>
+$output false
+resource Resources::Font FontLarge
+{
+  attr fontname FontName = Arial;
+  attr fontheight Height = 32;
+  attr fontquality Quality = High;
+  attr fontranges Ranges = 0x20-0xFF;
+  attr fontaspectratio AspectRatio = 1.0;
+  attr fontbold Bold = false;
+  attr fontitalic Italic = false;
+  attr fontkerning Kerning = true;
+  attr fontheightmode HeightMode = Compatible;
+  attr fontrowdistance RowDistance;
+}
+
+// Bitmap resource for the Embedded Wizard logo.
+$rect <430,20,630,60>
+$output false
+resource Resources::Bitmap Logo
+{
+  attr bitmapfile FileName = .\Res\EmWiLogo.png;
+  attr framesize FrameSize;
+  attr framedelay FrameDelay;
+  attr bitmapformat Format = Native;
+  attr bitmapdithering Dithering = Auto;
+  attr bitmapmode Mode = Default;
+}
+
+// Font resource for small font - used for the description text items.
+$rect <230,60,430,100>
+$output false
+resource Resources::Font FontSmall
+{
+  attr fontname FontName = Arial;
+  attr fontheight Height = 20;
+  attr fontquality Quality = High;
+  attr fontranges Ranges = 0x20-0xFF;
+  attr fontaspectratio AspectRatio = 1.0;
+  attr fontbold Bold = false;
+  attr fontitalic Italic = false;
+  attr fontkerning Kerning = true;
+  attr fontheightmode HeightMode = Compatible;
+  attr fontrowdistance RowDistance;
+}
+
+// This is the unit 'Application' of the HelloWorld example.
+// 
+// The unit contains the class 'Application' that implements the appearance and the \
+// behavior of the entire UI application.
+// 
+// Additionally, the unit contains the necessary resources for the sample: Two different \
+// font resources and one bitmap resource.
+// The font resources are used to display text views, bitmap resources are used within \
+// image views.
+// 
+// You can double-click on the 'Application' brick to open the class within the Composer.
+note legend Note1
+{
+  attr Bounds = <10,130,670,340>;
+}

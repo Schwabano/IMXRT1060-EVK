@@ -1,0 +1,177 @@
+﻿$version 14.00
+
+// This unit is a part of the Embedded Wizard framework 'Mosaic'
+$rect <40,70,240,110>
+unit Core
+{
+  attr Directory = $Mosaic;
+}
+
+// This unit is a part of the Embedded Wizard framework 'Mosaic'
+$rect <40,110,240,150>
+unit Resources
+{
+  attr Directory = $Mosaic;
+}
+
+// This unit is a part of the Embedded Wizard framework 'Mosaic'
+$rect <40,150,240,190>
+unit Graphics
+{
+  attr Directory = $Mosaic;
+}
+
+// This unit is a part of the Embedded Wizard framework 'Mosaic'
+$rect <40,190,240,230>
+unit Effects
+{
+  attr Directory = $Mosaic;
+}
+
+// This unit is a part of the Embedded Wizard framework 'Mosaic'
+$rect <40,230,240,270>
+unit Views
+{
+  attr Directory = $Mosaic;
+}
+
+// The 'default' Language. Each project has to contain at least one language brick \
+// called 'Default'
+$rect <540,70,740,110>
+language Default;
+
+// The unit of the application class
+$rect <540,230,740,270>
+unit Application
+{
+  attr Directory = .\;
+}
+
+// Mosaic Framework
+note group Note1
+{
+  attr Bounds = <20,20,260,290>;
+}
+
+// Profile Configuration
+note group Note2
+{
+  attr Bounds = <270,20,510,290>;
+}
+
+// Languages
+note group Note3
+{
+  attr Bounds = <520,20,760,130>;
+}
+
+// Implementation of the ScreenOrientation example
+note group Note5
+{
+  attr Bounds = <520,140,760,290>;
+}
+
+// Welcome to the example 'ScreenOrientation'!
+// 
+// The intention of this project is to show the possibility to create a GUI application \
+// that is independent from the physical layout of the LCD.
+// 
+// This means, you can create a GUI application in portrait mode for a target that \
+// is connected with a LCD in landscape mode (or the other way). Or you can run your \
+// GUI application using a display that is mounted with a rotation by 180 degrees.
+// The Code Generator of Embedded Wizard and the Graphics Engine running on the target \
+// will take care, that everything appears in the proper orientation.
+// 
+// Within the Profile settings of a project you can choose one of the following ScreenOrientations:
+// Normal, Rotated_90, Rotated_180 or Rotated_270
+// 
+// To generate code for the target, select the desired profile within the drop-down \
+// box and press 'F8'.
+note legend Note4
+{
+  attr Bounds = <20,300,760,610>;
+}
+
+// This is a profile member for the project. This profile controls the code generation \
+// for the target system.
+$rect <290,70,490,110>
+profile iMX_RT_0 : NXP.iMX_RT.RGB565
+{
+  attr ScreenSize = <480,272>;
+  attr Optimization = High;
+  attr ApplicationClass = Application::Application_Landscape;
+  attr ScreenOrientation = Normal;
+  attr ModeOfBitmapResources = Compressed;
+  attr ModeOfStringConstants = Compressed;
+  attr OutputDirectory = ..\..\..\Application\GeneratedCode;
+  attr CleanOutputDirectories = true;
+  attr FontConversion = Windows;
+  attr OutputFileNameExtension = c;
+  attr Verbose = false;
+
+  $rect <10,10,154,50>
+  macro Author = "Dipl. Ing. Paul Banach and Dipl. Ing. Manfred Schweyer, Copyright (C) TARA Systems GmbH";
+}
+
+// This is a profile member for the project. This profile controls the code generation \
+// for the target system.
+$rect <290,110,490,150>
+profile iMX_RT_90 : NXP.iMX_RT.RGB565
+{
+  attr ScreenSize = <272,480>;
+  attr Optimization = High;
+  attr ApplicationClass = Application::Application_Portrait;
+  attr ScreenOrientation = Rotated_90;
+  attr ModeOfBitmapResources = Compressed;
+  attr ModeOfStringConstants = Compressed;
+  attr OutputDirectory = ..\..\..\Application\GeneratedCode;
+  attr CleanOutputDirectories = true;
+  attr FontConversion = Windows;
+  attr OutputFileNameExtension = c;
+  attr Verbose = false;
+
+  $rect <10,10,154,50>
+  macro Author = "Dipl. Ing. Paul Banach and Dipl. Ing. Manfred Schweyer, Copyright (C) TARA Systems GmbH";
+}
+
+// This is a profile member for the project. This profile controls the code generation \
+// for the target system.
+$rect <290,150,490,190>
+profile iMX_RT_180 : NXP.iMX_RT.RGB565
+{
+  attr ScreenSize = <480,272>;
+  attr Optimization = High;
+  attr ApplicationClass = Application::Application_Landscape;
+  attr ScreenOrientation = Rotated_180;
+  attr ModeOfBitmapResources = Compressed;
+  attr ModeOfStringConstants = Compressed;
+  attr OutputDirectory = ..\..\..\Application\GeneratedCode;
+  attr CleanOutputDirectories = true;
+  attr FontConversion = Windows;
+  attr OutputFileNameExtension = c;
+  attr Verbose = false;
+
+  $rect <10,10,154,50>
+  macro Author = "Dipl. Ing. Paul Banach and Dipl. Ing. Manfred Schweyer, Copyright (C) TARA Systems GmbH";
+}
+
+// This is a profile member for the project. This profile controls the code generation \
+// for the target system.
+$rect <290,190,490,230>
+profile iMX_RT_270 : NXP.iMX_RT.RGB565
+{
+  attr ScreenSize = <272,480>;
+  attr Optimization = High;
+  attr ApplicationClass = Application::Application_Portrait;
+  attr ScreenOrientation = Rotated_270;
+  attr ModeOfBitmapResources = Compressed;
+  attr ModeOfStringConstants = Compressed;
+  attr OutputDirectory = ..\..\..\Application\GeneratedCode;
+  attr CleanOutputDirectories = true;
+  attr FontConversion = Windows;
+  attr OutputFileNameExtension = c;
+  attr Verbose = false;
+
+  $rect <10,10,154,50>
+  macro Author = "Dipl. Ing. Paul Banach and Dipl. Ing. Manfred Schweyer, Copyright (C) TARA Systems GmbH";
+}
